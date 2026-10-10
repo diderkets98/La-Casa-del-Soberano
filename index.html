@@ -75,22 +75,11 @@
   <button type="button" class="mode-tab mat-tab" id="matTab"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h12l4-3h2v5h-3l-2 2H10l-1 4h3v2H5v-2h2l1-4H3z"/></svg>MATERIALES</button>
 </div>
 
-<!-- PERISTA: bloque NPC/Cliente debajo de las pestañas -->
+<!-- PERISTA: selector NPC / Cliente -->
 <div class="perista-bar" id="peristaBar">
-  <div class="perista-row">
-    <label class="perista-lbl">Destino</label>
-    <div class="perista-btns">
-      <button type="button" class="perista-btn active" id="peristaDestNPC">🏦 NPC</button>
-      <button type="button" class="perista-btn" id="peristaDestCliente">👤 Cliente</button>
-    </div>
-  </div>
-  <div class="perista-row">
-    <label class="perista-lbl" for="peristaAdq">Lo que pagué</label>
-    <div class="money perista-money"><i>$</i><input id="peristaAdq" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
-  </div>
-  <div class="perista-ganancia" id="peristaGanancia" hidden>
-    <span id="peristaGananciaLabel">Ganancia al vender al NPC</span>
-    <span id="peristaGananciaVal">$0.00</span>
+  <div class="perista-btns">
+    <button type="button" class="perista-btn active" id="peristaDestNPC">🏦 NPC</button>
+    <button type="button" class="perista-btn" id="peristaDestCliente">👤 Cliente</button>
   </div>
 </div>
 
@@ -418,7 +407,23 @@
  var box=document.getElementById('products'), html='';
  prods.forEach(function(p){
   var c=cats.filter(function(k){return k.id===p.categoria})[0]||cats[0]||{id:'otros',nombre:'Otros'}, pr=(Math.round(Number(p.precio||0)*100)/100).toFixed(2);
-  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'">\n      <div class="weapon-icon">✦</div>\n      <div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>\n      <div class="price">$'+pr+'</div>\n      <div class="qty"><button class="minus" aria-label="Restar">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"><button class="plus" aria-label="Sumar">+</button></div>\n      <div class="subtotal">$0.00</div>\n    </div>\n';
+  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'" data-price-npc="'+pr+'">'+
+    '<div class="weapon-icon">✦</div>'+
+    '<div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>'+
+    '<div class="price" data-base="'+pr+'">$'+pr+'</div>'+
+    '<div class="perista-precios">'+
+      '<div class="perista-precio-row">'+
+        '<span class="perista-precio-lbl" id="lbl-adq-'+x(p.nombre).replace(/[^a-z0-9]/gi,\'_\')+'">Compré a</span>'+
+        '<div class="perista-precio-inp"><i>$</i><input class="perista-adq-inp" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" tabindex="-1"></div>'+
+      '</div>'+
+      '<div class="perista-precio-row perista-venta-row">'+
+        '<span class="perista-precio-lbl">Vendo a</span>'+
+        '<div class="perista-precio-inp"><i>$</i><input class="perista-venta-inp" type="text" inputmode="decimal" placeholder="'+pr+'" autocomplete="off" tabindex="-1" data-default="'+pr+'"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="qty"><button class="minus" aria-label="Restar">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"><button class="plus" aria-label="Sumar">+</button></div>'+
+    '<div class="subtotal">$0.00</div>'+
+  '</div>\n';
  });
  box.insertAdjacentHTML('afterbegin',html);
 })();

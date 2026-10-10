@@ -1611,3 +1611,22 @@ img[data-failed]{visibility:hidden}
 .perista-ganancia{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:6px;background:#0a2a15;border:1px dashed #3a7a44;font-size:14px;font-weight:bold;color:#a0c8a0}
 #peristaGananciaVal{font-size:17px;color:#4ecb82}
 #peristaGananciaVal.neg{color:#e05a5a}
+
+/* ── Perista: campos de precio por producto ── */
+.perista-bar{background:#0d1f15;border:1px solid #2a4a2e;border-radius:0 0 8px 8px;padding:8px 14px;margin:-4px 0 8px;display:flex;align-items:center;gap:8px}
+.perista-btns{display:flex;gap:6px}
+.perista-btn{padding:6px 18px;border-radius:20px;border:1px solid #3a5a3e;background:#132a1a;color:#c8b87a;font-size:13px;font-weight:bold;cursor:pointer;transition:background .15s,color .15s;letter-spacing:.04em}
+.perista-btn.active{background:#2a5a34;color:#f0e0a0;border-color:#5a9a5e}
+.perista-precios{display:flex;flex-direction:column;gap:3px;padding:4px 0}
+.perista-precio-row{display:flex;align-items:center;gap:4px;font-size:12px}
+.perista-precio-lbl{color:#8a9a84;min-width:58px;font-variant:small-caps;font-size:11px}
+.perista-precio-inp{display:flex;align-items:center;gap:2px;background:#0a1a0f;border:1px solid #2a4a2e;border-radius:4px;padding:2px 5px}
+.perista-precio-inp i{color:#8a9a84;font-style:normal;font-size:12px}
+.perista-precio-inp input{width:58px;background:transparent;border:none;color:#f0e0a0;font-size:12px;padding:0;font-family:inherit}
+.perista-precio-inp input::placeholder{color:#4a5a44}
+.perista-venta-row .perista-precio-inp{border-color:#3a6a3e}
+.perista-venta-row .perista-precio-inp input{color:#7ecf8a}
+/* Ganancia en el panel lateral */
+.perista-gan-row{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:14px;color:#a0c8a0;font-weight:bold;border-top:1px dashed #2a4a2e;margin-top:4px}
+#peristaGananciaVal{font-size:16px;color:#4ecb82}
+#peristaGananciaVal.neg{color:#e05a5a}
