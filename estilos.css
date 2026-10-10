@@ -1597,12 +1597,6 @@ img[data-failed]{visibility:hidden}
 
 /* En modo NPC el campo de venta no es editable */
 
-/* ══ PERISTA: botones NPC/Cliente ══ */
-.perista-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#0a1510;border-bottom:1px solid #1e3025}
-.perista-btn{padding:5px 16px;border-radius:16px;border:1px solid #3a5030;background:#0f1e14;color:#8a9a7a;font-size:12px;font-weight:bold;cursor:pointer;letter-spacing:.06em;transition:all .15s;font-family:inherit}
-.perista-btn.active{background:#1e3d22;color:#e8d48a;border-color:#8a6a2e;box-shadow:0 0 8px #d7ae5430}
-
-/* ══ PERISTA: campos precio en cada producto ══ */
 /* El grid del producto pasa de 5 columnas a 6: añadimos la columna de precios */
 .product{grid-template-columns:44px minmax(130px,1fr) auto 160px 90px!important}
 .p-precios{display:flex;flex-direction:column;gap:3px;padding:2px 4px}
@@ -1615,13 +1609,49 @@ img[data-failed]{visibility:hidden}
 body.modo-npc .p-venta{color:#4a6a50;pointer-events:none}
 body.modo-cliente .p-venta{color:#7ecf8a;border-color:#2e5a34;pointer-events:auto}
 
-/* ══ PERISTA: ganancia en panel lateral ══ */
-.perista-gan-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;margin:4px 0;border-radius:5px;background:#061209;border:1px dashed #2a4a2e;font-size:13px;color:#8aaa84}
-#pGanVal{font-size:16px;font-weight:bold}
-
 /* Mobile: stack los campos de precio */
 @media(max-width:600px){
   .product{grid-template-columns:34px 1fr 80px!important}
   .p-precios{grid-column:1/4;flex-direction:row;gap:12px;padding:4px 6px}
   .p-adq,.p-venta{width:72px}
 }
+
+/* ══ PERISTA: botones NPC / Cliente ══ */
+.perista-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#0a1510;border-bottom:1px solid #1e3025}
+.perista-btn{padding:5px 18px;border-radius:16px;border:1px solid #3a5030;background:#0f1e14;color:#7a8a72;font-size:12px;font-weight:bold;cursor:pointer;letter-spacing:.06em;transition:all .15s;font-family:inherit}
+.perista-btn.active{background:#1e3d22;color:#e8d48a;border-color:#8a6a2e;box-shadow:0 0 8px #d7ae5430}
+
+/* ══ PERISTA: layout 3 columnas por producto ══ */
+.product{display:block!important;padding:10px 14px!important;border-bottom:1px solid #1e3025;background:linear-gradient(90deg,#0a1711,#08110d);border-left:3px solid transparent;transition:background .3s,border-color .3s}
+.product:hover{background:#10231a}
+.product.has-qty{border-left-color:var(--gold);background:linear-gradient(90deg,#1b2a14,#0d1f16 70%)}
+.product.no-stock{opacity:.55}
+.p-header{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.p-nombre{font-size:15px;color:#d9ccaa;font-weight:500}
+.p-cat{font-size:10px;color:#786f5d;text-transform:uppercase;letter-spacing:.12em}
+.p-nostock{font-size:10px;color:#c0392b;font-weight:bold;text-transform:uppercase;letter-spacing:.08em}
+.p-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end}
+.p-col{display:flex;flex-direction:column;align-items:center;gap:5px}
+.p-col-lbl{font-size:11px;color:#7a8a72;text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.p-venta-lbl{color:#5a8a5e}
+body.modo-cliente .p-venta-lbl{color:#7ecf8a}
+.p-col-val{font-size:20px;font-weight:bold;color:#e8d48a;text-align:center;min-height:30px;display:flex;align-items:center;justify-content:center}
+.p-col-qty-val{font-size:22px;color:#fff}
+.p-adq,.p-venta{width:100%;background:#060e08;border:1px solid #2a3a22;border-radius:6px;color:#e8d48a;font-size:18px;font-weight:bold;padding:4px 8px;font-family:inherit;text-align:center}
+.p-adq::placeholder,.p-venta::placeholder{color:#2e4030;font-size:13px;font-weight:normal}
+.p-venta{border-color:#1e4025;color:#6ab87a}
+body.modo-npc .p-venta{color:#4a7a52;pointer-events:none}
+body.modo-cliente .p-venta{color:#7ecf8a;border-color:#2e6034;pointer-events:auto}
+.p-col-btn{width:100%;padding:8px 0;border-radius:6px;border:1px solid #8a6a2e;background:#11140e;color:#f4d87f;font-size:20px;cursor:pointer;touch-action:manipulation;transition:background .1s}
+.p-col-btn:active{background:#2a200a}
+.p-col-btn-mid{display:flex;gap:0;width:100%}
+.p-col-btn-mid .minus,.p-col-btn-mid .plus{flex:1;padding:8px 0;border:1px solid #8a6a2e;background:#11140e;color:#f4d87f;font-size:20px;cursor:pointer;touch-action:manipulation;transition:background .1s}
+.p-col-btn-mid .minus{border-radius:6px 0 0 6px;border-right:0}
+.p-col-btn-mid .plus{border-radius:0 6px 6px 0}
+.p-col-btn-mid .minus:active,.p-col-btn-mid .plus:active{background:#2a200a}
+.p-col-qty-val input{width:60px;background:transparent;border:none;color:#fff;font-size:22px;font-weight:bold;text-align:center;font-family:inherit}
+.subtotal{text-align:right;color:#f3d47c;font-weight:bold;font-size:14px;margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* ══ PERISTA: ganancia en panel lateral ══ */
+.perista-gan-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;margin:6px 0;border-radius:5px;background:#061209;border:1px dashed #2a4a2e;font-size:13px;color:#8aaa84}
+#pGanVal{font-size:16px;font-weight:bold}

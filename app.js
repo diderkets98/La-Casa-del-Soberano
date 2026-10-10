@@ -806,34 +806,33 @@ function moneyField(inp,key){
 moneyField(depositInput,'deposit');
 noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerChanged()});
 
-/* ══ PERISTA: NPC / Cliente — precios por producto ══ */
+/* ══ PERISTA: NPC / Cliente — layout 3 columnas ══ */
 (function(){
   var btnNPC=document.getElementById('peristaDestNPC');
   var btnCliente=document.getElementById('peristaDestCliente');
   window._peristaMode='npc';
 
   function parseMny(v){return parseFloat(String(v||'').replace(',','.'))||0}
-  function fmt(n){return(n<0?'-':'')+' $'+Math.abs(n).toFixed(2)}
+  function fmt(n){return(n<0?'−':'')+' $'+Math.abs(n).toFixed(2)}
 
   function applyMode(){
     var mode=window._peristaMode;
-    document.body.classList.toggle('modo-npc', mode==='npc');
-    document.body.classList.toggle('modo-cliente', mode==='cliente');
+    document.body.classList.toggle('modo-npc',mode==='npc');
+    document.body.classList.toggle('modo-cliente',mode==='cliente');
     document.querySelectorAll('.product').forEach(function(prod){
       var npc=parseFloat(prod.dataset.npc)||0;
       var ventaInp=prod.querySelector('.p-venta');
-      var qtyInp=prod.querySelector('.qty input');
-      var priceEl=prod.querySelector('.price');
+      var lbl=prod.querySelector('.p-venta-lbl');
+      var qtyInp=prod.querySelector('.p-col-qty-val input');
       if(mode==='npc'){
-        /* Venta fija al NPC */
-        if(ventaInp){ventaInp.value='';ventaInp.placeholder=npc.toFixed(2);}
+        if(ventaInp){ventaInp.placeholder=npc.toFixed(2);ventaInp.readOnly=true;}
+        if(lbl)lbl.textContent='Venta al NPC';
         if(qtyInp)qtyInp.dataset.price=npc.toFixed(2);
-        if(priceEl)priceEl.textContent='$'+npc.toFixed(2);
       } else {
-        /* Cliente: precio de venta editable */
+        if(ventaInp){ventaInp.readOnly=false;}
+        if(lbl)lbl.textContent='Venta al Cliente';
         var v=parseMny(ventaInp?ventaInp.value:'')||npc;
         if(qtyInp)qtyInp.dataset.price=v.toFixed(2);
-        if(priceEl)priceEl.textContent='$'+v.toFixed(2);
       }
     });
     updateGanancia();
@@ -843,7 +842,7 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
     var mode=window._peristaMode;
     var totalVenta=0,totalAdq=0,hayAdq=false;
     document.querySelectorAll('.product').forEach(function(prod){
-      var qty=parseInt((prod.querySelector('.qty input')||{}).value)||0;
+      var qty=parseInt((prod.querySelector('.p-col-qty-val input')||{}).value)||0;
       if(!qty)return;
       var npc=parseFloat(prod.dataset.npc)||0;
       var adq=parseMny((prod.querySelector('.p-adq')||{}).value);
@@ -854,24 +853,23 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
     });
     var box=document.getElementById('peristaGananciaBox');
     if(!box){
-      var ref=document.querySelector('#grand')&&document.querySelector('#grand').parentNode;
-      if(!ref)ref=document.querySelector('.fin-rows,.breakdown,.total-section');
+      var ref=document.getElementById('grand');
       if(ref){
         box=document.createElement('div');
         box.id='peristaGananciaBox';
         box.className='perista-gan-row';
         box.innerHTML='<span id="pGanLbl">Ganancia estimada</span><span id="pGanVal"></span>';
-        ref.appendChild(box);
+        ref.parentNode.insertBefore(box,ref);
       }
     }
     if(!box)return;
-    if(!totalVenta||!hayAdq){box.style.display='none';return;}
+    if(!hayAdq){box.style.display='none';return;}
     box.style.display='flex';
     var gan=totalVenta-totalAdq;
     var valEl=document.getElementById('pGanVal');
     var lblEl=document.getElementById('pGanLbl');
     if(valEl){valEl.textContent=fmt(gan);valEl.style.color=gan>=0?'#4ecb82':'#e05a5a';}
-    if(lblEl)lblEl.textContent=mode==='npc'?'Ganancia al NPC':'Ganancia al cliente';
+    if(lblEl)lblEl.textContent=mode==='npc'?'Ganancia al vender al NPC':'Ganancia al vender al cliente';
   }
 
   function setMode(m){
@@ -881,25 +879,21 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
     applyMode();
   }
 
-  /* Eventos: cambio en campos adq/venta */
   document.addEventListener('input',function(e){
     var t=e.target;
     if(!t.classList.contains('p-adq')&&!t.classList.contains('p-venta'))return;
     t.value=t.value.replace(/[^0-9.,]/g,'');
-    var prod=t.closest('.product');
+    var prod=t.closest?t.closest('.product'):null;
     if(!prod)return;
     if(t.classList.contains('p-venta')&&window._peristaMode==='cliente'){
       var npc=parseFloat(prod.dataset.npc)||0;
       var v=parseMny(t.value)||npc;
-      var qtyInp=prod.querySelector('.qty input');
-      var priceEl=prod.querySelector('.price');
+      var qtyInp=prod.querySelector('.p-col-qty-val input');
       if(qtyInp){qtyInp.dataset.price=v.toFixed(2);qtyInp.dispatchEvent(new Event('change'));}
-      if(priceEl)priceEl.textContent='$'+v.toFixed(2);
     }
     updateGanancia();
   });
 
-  /* Recalcula cuando cambia carrito */
   var obs=new MutationObserver(updateGanancia);
   var cartEl=document.getElementById('cart');
   if(cartEl)obs.observe(cartEl,{childList:true,subtree:true});

@@ -399,16 +399,26 @@
   var c=cats.filter(function(k){return k.id===p.categoria})[0]||cats[0]||{id:'otros',nombre:'Otros'}, pr=(Math.round(Number(p.precio||0)*100)/100).toFixed(2);
   html+=
     '<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'" data-npc="'+pr+'">'+
-      '<div class="weapon-icon">✦</div>'+
-      '<div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>'+
-      '<div class="p-precios">'+
-        '<div class="p-precio-adq"><span>Pagué</span><input class="p-adq" type="text" inputmode="decimal" placeholder="0.00" title="Precio de adquisición"></div>'+
-        '<div class="p-precio-venta"><span class="p-venta-lbl">NPC</span><input class="p-venta" type="text" inputmode="decimal" placeholder="'+pr+'" title="Precio de venta" data-default="'+pr+'"></div>'+
+      '<div class="p-header">'+
+        '<span class="p-nombre">'+x(p.nombre)+'</span>'+
+        '<small class="p-cat">'+x(c.nombre)+'</small>'+
       '</div>'+
-      '<div class="qty">'+
-        '<button class="minus" aria-label="Restar">−</button>'+
-        '<input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'">'+
-        '<button class="plus" aria-label="Sumar">+</button>'+
+      '<div class="p-cols">'+
+        '<div class="p-col">'+
+          '<div class="p-col-lbl">Adquisición</div>'+
+          '<div class="p-col-val"><input class="p-adq" type="text" inputmode="decimal" placeholder="$0.00" data-name="'+x(p.nombre)+'"></div>'+
+          '<button class="p-col-btn minus" aria-label="Restar">−</button>'+
+        '</div>'+
+        '<div class="p-col p-col-mid">'+
+          '<div class="p-col-lbl">Cantidad</div>'+
+          '<div class="p-col-val p-col-qty-val"><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
+          '<div class="p-col-btn-mid"><button class="minus" aria-label="Restar">−</button><button class="plus" aria-label="Sumar">+</button></div>'+
+        '</div>'+
+        '<div class="p-col">'+
+          '<div class="p-col-lbl p-venta-lbl">Venta al NPC</div>'+
+          '<div class="p-col-val"><input class="p-venta" type="text" inputmode="decimal" placeholder="'+pr+'" data-default="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
+          '<button class="p-col-btn plus" aria-label="Sumar">+</button>'+
+        '</div>'+
       '</div>'+
       '<div class="subtotal">$0.00</div>'+
     '</div>';
