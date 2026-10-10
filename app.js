@@ -813,71 +813,64 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
   window._peristaMode='npc';
 
   function parseMny(v){return parseFloat(String(v||'').replace(',','.'))||0}
-  function fmt(n){return '$'+Math.abs(n).toFixed(2)}
+  function fmt(n){return(n<0?'-':'')+' $'+Math.abs(n).toFixed(2)}
 
-  /* Actualiza visibilidad de filas según modo */
   function applyMode(){
     var mode=window._peristaMode;
+    document.body.classList.toggle('modo-npc', mode==='npc');
+    document.body.classList.toggle('modo-cliente', mode==='cliente');
     document.querySelectorAll('.product').forEach(function(prod){
-      var npcPrice=parseFloat(prod.dataset.priceNpc)||0;
-      var priceEl=prod.querySelector('.price');
-      var ventaRow=prod.querySelector('.perista-venta-row');
-      var adqInp=prod.querySelector('.perista-adq-inp');
-      var ventaInp=prod.querySelector('.perista-venta-inp');
+      var npc=parseFloat(prod.dataset.npc)||0;
+      var ventaInp=prod.querySelector('.p-venta');
       var qtyInp=prod.querySelector('.qty input');
-
+      var priceEl=prod.querySelector('.price');
       if(mode==='npc'){
-        /* Precio fijo NPC visible, fila venta oculta */
-        if(priceEl)priceEl.textContent='$'+npcPrice.toFixed(2);
-        if(ventaRow)ventaRow.style.display='none';
-        if(qtyInp)qtyInp.dataset.price=npcPrice.toFixed(2);
+        /* Venta fija al NPC */
+        if(ventaInp){ventaInp.value='';ventaInp.placeholder=npc.toFixed(2);}
+        if(qtyInp)qtyInp.dataset.price=npc.toFixed(2);
+        if(priceEl)priceEl.textContent='$'+npc.toFixed(2);
       } else {
-        /* Modo cliente: precio editable */
-        var ventaVal=parseMny(ventaInp?ventaInp.value:'');
-        var precio=ventaVal||npcPrice;
-        if(priceEl)priceEl.textContent='$'+precio.toFixed(2);
-        if(ventaRow)ventaRow.style.display='flex';
-        if(qtyInp)qtyInp.dataset.price=precio.toFixed(2);
+        /* Cliente: precio de venta editable */
+        var v=parseMny(ventaInp?ventaInp.value:'')||npc;
+        if(qtyInp)qtyInp.dataset.price=v.toFixed(2);
+        if(priceEl)priceEl.textContent='$'+v.toFixed(2);
       }
     });
     updateGanancia();
   }
 
-  /* Calcula ganancia total en panel lateral */
   function updateGanancia(){
     var mode=window._peristaMode;
-    var totalVenta=0,totalAdq=0;
+    var totalVenta=0,totalAdq=0,hayAdq=false;
     document.querySelectorAll('.product').forEach(function(prod){
       var qty=parseInt((prod.querySelector('.qty input')||{}).value)||0;
       if(!qty)return;
-      var npcPrice=parseFloat(prod.dataset.priceNpc)||0;
-      var adqVal=parseMny((prod.querySelector('.perista-adq-inp')||{}).value);
-      var ventaVal=parseMny((prod.querySelector('.perista-venta-inp')||{}).value);
-      var precioVenta=mode==='npc'?npcPrice:(ventaVal||npcPrice);
+      var npc=parseFloat(prod.dataset.npc)||0;
+      var adq=parseMny((prod.querySelector('.p-adq')||{}).value);
+      var ventaV=parseMny((prod.querySelector('.p-venta')||{}).value);
+      var precioVenta=mode==='npc'?npc:(ventaV||npc);
       totalVenta+=precioVenta*qty;
-      totalAdq+=adqVal*qty;
+      if(adq){totalAdq+=adq*qty;hayAdq=true;}
     });
-
-    /* Mostrar en panel lateral */
     var box=document.getElementById('peristaGananciaBox');
     if(!box){
-      /* Crear caja de ganancia en el panel si no existe */
-      var fin=document.querySelector('.fin-box,.pay-box,#finBox,#totalBox,.total-row');
-      if(fin){
+      var ref=document.querySelector('#grand')&&document.querySelector('#grand').parentNode;
+      if(!ref)ref=document.querySelector('.fin-rows,.breakdown,.total-section');
+      if(ref){
         box=document.createElement('div');
         box.id='peristaGananciaBox';
         box.className='perista-gan-row';
-        box.innerHTML='<span id="peristaGananciaLabel">Ganancia estimada</span><span id="peristaGananciaVal">$0.00</span>';
-        fin.parentNode.insertBefore(box,fin);
+        box.innerHTML='<span id="pGanLbl">Ganancia estimada</span><span id="pGanVal"></span>';
+        ref.appendChild(box);
       }
     }
     if(!box)return;
-    if(!totalVenta){box.style.display='none';return;}
+    if(!totalVenta||!hayAdq){box.style.display='none';return;}
     box.style.display='flex';
     var gan=totalVenta-totalAdq;
-    var valEl=document.getElementById('peristaGananciaVal');
-    var lblEl=document.getElementById('peristaGananciaLabel');
-    if(valEl){valEl.textContent=fmt(gan);valEl.className=gan<0?'neg':'';}
+    var valEl=document.getElementById('pGanVal');
+    var lblEl=document.getElementById('pGanLbl');
+    if(valEl){valEl.textContent=fmt(gan);valEl.style.color=gan>=0?'#4ecb82':'#e05a5a';}
     if(lblEl)lblEl.textContent=mode==='npc'?'Ganancia al NPC':'Ganancia al cliente';
   }
 
@@ -888,39 +881,31 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
     applyMode();
   }
 
-  if(btnNPC)btnNPC.addEventListener('click',function(){setMode('npc');});
-  if(btnCliente)btnCliente.addEventListener('click',function(){setMode('cliente');});
-
-  /* Delegación de eventos en el catálogo */
+  /* Eventos: cambio en campos adq/venta */
   document.addEventListener('input',function(e){
-    var prod=e.target.closest?e.target.closest('.product'):null;
+    var t=e.target;
+    if(!t.classList.contains('p-adq')&&!t.classList.contains('p-venta'))return;
+    t.value=t.value.replace(/[^0-9.,]/g,'');
+    var prod=t.closest('.product');
     if(!prod)return;
-    if(e.target.classList.contains('perista-adq-inp')||e.target.classList.contains('perista-venta-inp')){
-      e.target.value=e.target.value.replace(/[^0-9.,]/g,'');
-      if(e.target.classList.contains('perista-venta-inp')&&window._peristaMode==='cliente'){
-        var npcPrice=parseFloat(prod.dataset.priceNpc)||0;
-        var val=parseMny(e.target.value)||npcPrice;
-        var priceEl=prod.querySelector('.price');
-        var qtyInp=prod.querySelector('.qty input');
-        if(priceEl)priceEl.textContent='$'+val.toFixed(2);
-        if(qtyInp){qtyInp.dataset.price=val.toFixed(2);qtyInp.dispatchEvent(new Event('change'));}
-      }
-      updateGanancia();
+    if(t.classList.contains('p-venta')&&window._peristaMode==='cliente'){
+      var npc=parseFloat(prod.dataset.npc)||0;
+      var v=parseMny(t.value)||npc;
+      var qtyInp=prod.querySelector('.qty input');
+      var priceEl=prod.querySelector('.price');
+      if(qtyInp){qtyInp.dataset.price=v.toFixed(2);qtyInp.dispatchEvent(new Event('change'));}
+      if(priceEl)priceEl.textContent='$'+v.toFixed(2);
     }
+    updateGanancia();
   });
 
-  /* Recalcula cuando cambia el carrito */
+  /* Recalcula cuando cambia carrito */
   var obs=new MutationObserver(updateGanancia);
   var cartEl=document.getElementById('cart');
   if(cartEl)obs.observe(cartEl,{childList:true,subtree:true});
 
-  /* Aplicar modo inicial al cargar productos */
-  var obsDoc=new MutationObserver(function(){applyMode();});
-  var catEl=document.getElementById('catalog')||document.getElementById('productList')||document.querySelector('.catalog');
-  if(catEl)obsDoc.observe(catEl,{childList:true,subtree:false});
-
-  window._peristaApplyMode=applyMode;
-  window._peristaUpdateGanancia=updateGanancia;
+  if(btnNPC)btnNPC.addEventListener('click',function(){setMode('npc');});
+  if(btnCliente)btnCliente.addEventListener('click',function(){setMode('cliente');});
   setMode('npc');
 })();
 promiseInput.addEventListener('change',()=>{customer.promise=promiseInput.value;customerChanged()});

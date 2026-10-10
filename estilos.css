@@ -1630,3 +1630,14 @@ img[data-failed]{visibility:hidden}
 .perista-gan-row{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:14px;color:#a0c8a0;font-weight:bold;border-top:1px dashed #2a4a2e;margin-top:4px}
 #peristaGananciaVal{font-size:16px;color:#4ecb82}
 #peristaGananciaVal.neg{color:#e05a5a}
+
+/* ── Perista: campos adquisición y venta por producto ── */
+.p-adq,.p-venta{width:72px;background:#0a1a0f;border:1px solid #2a4a2e;border-radius:4px;color:#f0e0a0;font-size:12px;padding:3px 5px;font-family:inherit;text-align:center}
+.p-adq{border-color:#4a3a1e;color:#c8b87a}
+.p-adq::placeholder{color:#5a4a2e;font-size:11px}
+.p-venta{border-color:#2a5a34;color:#7ecf8a}
+.p-venta::placeholder{color:#3a6a3e;font-size:11px}
+.p-venta[readonly]{opacity:.5;cursor:default}
+/* En modo NPC el campo de venta no es editable */
+body.modo-npc .p-venta{opacity:.6;pointer-events:none}
+body.modo-cliente .p-venta{opacity:1;pointer-events:auto}

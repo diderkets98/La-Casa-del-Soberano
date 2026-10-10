@@ -397,7 +397,19 @@
  var box=document.getElementById('products'), html='';
  prods.forEach(function(p){
   var c=cats.filter(function(k){return k.id===p.categoria})[0]||cats[0]||{id:'otros',nombre:'Otros'}, pr=(Math.round(Number(p.precio||0)*100)/100).toFixed(2);
-  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'">\n      <div class="weapon-icon">✦</div>\n      <div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>\n      <div class="price">$'+pr+'</div>\n      <div class="qty"><button class="minus" aria-label="Restar">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"><button class="plus" aria-label="Sumar">+</button></div>\n      <div class="subtotal">$0.00</div>\n    </div>\n';
+  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'" data-npc="'+pr+'">'+
+    '<div class="weapon-icon">✦</div>'+
+    '<div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>'+
+    '<div class="price">$'+pr+'</div>'+
+    '<input class="p-adq" type="text" inputmode="decimal" placeholder="Compré a" title="Precio de adquisición">'+
+    '<div class="qty">'+
+      '<button class="minus" aria-label="Restar">−</button>'+
+      '<input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'">'+
+      '<button class="plus" aria-label="Sumar">+</button>'+
+    '</div>'+
+    '<input class="p-venta" type="text" inputmode="decimal" placeholder="'+pr+'" title="Precio de venta" data-default="'+pr+'">'+
+    '<div class="subtotal">$0.00</div>'+
+  '</div>';
  });
  box.insertAdjacentHTML('afterbegin',html);
 })();
