@@ -1,6 +1,12 @@
 /* ================================================================
    tienda.js · LA CASA DEL SOBERANO
    Perista · Saint Denis · 1880
+   "Lo que otros pierden, aquí encuentra dueño."
+   ================================================================
+   GUÍA DE PRECIOS:
+   - precio: es lo que paga el NPC (o precio máx. de venta para ilegales)
+   - Tú siempre compras POR DEBAJO de ese precio para ganar la diferencia
+   - Ilegales: precio máx. de compra indicado en notas, negocia siempre menos
    ================================================================ */
 var TIENDA = {
 
@@ -8,62 +14,178 @@ var TIENDA = {
   supabaseKey: 'sb_publishable_R9w5QKqznrBFuV0-aQR7PQ_5Ab_tBzP',
 
   categorias: [
-    { id: 'joyas',     nombre: 'Joyas',              seccion: 'JOYAS',       tipo: 'producto' },
-    { id: 'relojes',   nombre: 'Relojes y Adornos',  seccion: 'JOYAS',       tipo: 'producto' },
-    { id: 'arte',      nombre: 'Arte y Antigüedades', seccion: 'OBJETOS',     tipo: 'producto' },
-    { id: 'tabaco',    nombre: 'Tabaco y Licores',    seccion: 'SUMINISTROS', tipo: 'suministro' },
-    { id: 'pieles',    nombre: 'Pieles y Trofeos',    seccion: 'NATURALES',   tipo: 'producto' },
-    { id: 'ilegales',  nombre: 'Mercancía Especial',  seccion: 'ESPECIAL',    tipo: 'producto' }
+    { id: 'npc',       nombre: 'Objetos NPC',       seccion: 'OBJETOS NPC',      tipo: 'producto' },
+    { id: 'ilegales',  nombre: 'Ilegales / Crafteo', seccion: 'ILEGALES',         tipo: 'producto' },
+    { id: 'articulos', nombre: 'Artículos',          seccion: 'ARTÍCULOS',        tipo: 'producto' },
+    { id: 'empenos',   nombre: 'Casa de Empeños',    seccion: 'EMPEÑOS',          tipo: 'producto' },
+    { id: 'materiales',nombre: 'Materiales',         seccion: 'MATERIALES',       tipo: 'suministro' }
   ],
 
   productos: [
-    /* ── JOYAS ──────────────────────────────────────────── */
-    { nombre: 'Collar de Oro',          categoria: 'joyas',    precio: 80.00 },
-    { nombre: 'Collar de Rubíes',       categoria: 'joyas',    precio: 120.00 },
-    { nombre: 'Collar de Diamantes',    categoria: 'joyas',    precio: 200.00 },
-    { nombre: 'Pulsera de Oro',         categoria: 'joyas',    precio: 65.00 },
-    { nombre: 'Anillo de Diamante',     categoria: 'joyas',    precio: 150.00 },
-    { nombre: 'Anillo de Rubí',         categoria: 'joyas',    precio: 90.00 },
-    { nombre: 'Anillo de Esmeralda',    categoria: 'joyas',    precio: 100.00 },
-    { nombre: 'Pendientes de Perlas',   categoria: 'joyas',    precio: 70.00 },
-    { nombre: 'Broche de Diamantes',    categoria: 'joyas',    precio: 130.00 },
-    { nombre: 'Diadema de Brillantes',  categoria: 'joyas',    precio: 175.00 },
 
-    /* ── RELOJES Y ADORNOS ───────────────────────────────── */
-    { nombre: 'Reloj de Bolsillo de Oro',      categoria: 'relojes', precio: 110.00 },
-    { nombre: 'Reloj de Bolsillo de Plata',    categoria: 'relojes', precio: 75.00 },
-    { nombre: 'Reloj de Lujo',                 categoria: 'relojes', precio: 160.00 },
-    { nombre: 'Pin de Oro',                    categoria: 'relojes', precio: 55.00 },
-    { nombre: 'Alfiler de Corbata',            categoria: 'relojes', precio: 45.00 },
-    { nombre: 'Pitillera de Plata',            categoria: 'relojes', precio: 60.00 },
+    /* ══════════════════════════════════════════════════════
+       OBJETOS NPC — precio = lo que paga el NPC
+       Tu ganancia = precio NPC − lo que pagaste tú
+    ══════════════════════════════════════════════════════ */
+    { nombre: 'Crucifijo de plata',     categoria: 'npc', precio: 1.75 },
+    { nombre: 'Cachimba de oro',        categoria: 'npc', precio: 3.72 },
+    { nombre: 'Espejo',                 categoria: 'npc', precio: 8.40 },
+    { nombre: 'Linterna de Navi',       categoria: 'npc', precio: 1.53 },
+    { nombre: 'Éter',                   categoria: 'npc', precio: 0.95 },
+    { nombre: 'Cachimba rosa',          categoria: 'npc', precio: 1.02 },
+    { nombre: 'Gargantilla',            categoria: 'npc', precio: 36.00 },
+    { nombre: 'Pendiente de oro',       categoria: 'npc', precio: 6.00 },
+    { nombre: 'Collar de perlas',       categoria: 'npc', precio: 12.09 },
+    { nombre: 'Reloj de lujo',          categoria: 'npc', precio: 23.06 },
+    { nombre: 'Alfiler',                categoria: 'npc', precio: 12.20 },
+    { nombre: 'Estatua de cerámica',    categoria: 'npc', precio: 14.40 },
+    { nombre: 'Solitario de rosa',      categoria: 'npc', precio: 5.76 },
+    { nombre: 'Linterna',               categoria: 'npc', precio: 1.53 },
+    { nombre: 'Pulsera',                categoria: 'npc', precio: 17.14 },
+    { nombre: 'Cachimba morada',        categoria: 'npc', precio: 1.02 },
+    { nombre: 'Cuadro lujoso 1',        categoria: 'npc', precio: 120.00 },
+    { nombre: 'Cuadro lujoso 2',        categoria: 'npc', precio: 120.00 },
+    { nombre: 'Cuadro lujoso 3',        categoria: 'npc', precio: 120.00 },
+    { nombre: 'Estatua',                categoria: 'npc', precio: 14.40 },
+    { nombre: 'Cachimba roja',          categoria: 'npc', precio: 1.02 },
+    { nombre: 'Cachimba plateada',      categoria: 'npc', precio: 1.32 },
+    { nombre: 'Estatua de fertilidad',  categoria: 'npc', precio: 18.00 },
+    { nombre: 'Insignia',               categoria: 'npc', precio: 13.60 },
+    { nombre: 'Joyero',                 categoria: 'npc', precio: 1.03 },
+    { nombre: 'Lata de hojalata',       categoria: 'npc', precio: 0.42 },
+    { nombre: 'Collar de oro',          categoria: 'npc', precio: 18.00 },
+    { nombre: 'Pendiente de esmeralda', categoria: 'npc', precio: 4.86 },
+    { nombre: 'Reloj de bolsillo',      categoria: 'npc', precio: 6.33 },
+    { nombre: 'Binoculares mejorados',  categoria: 'npc', precio: 3.45 },
+    { nombre: 'Peine de plata',         categoria: 'npc', precio: 1.00 },
+    { nombre: 'Collar de diamantes',    categoria: 'npc', precio: 120.00 },
+    { nombre: 'Reloj de pared',         categoria: 'npc', precio: 10.80 },
+    { nombre: 'Pluma de oro',           categoria: 'npc', precio: 6.00 },
+    { nombre: 'Alianza',                categoria: 'npc', precio: 3.00 },
+    { nombre: 'Cuadro',                 categoria: 'npc', precio: 12.00 },
+    { nombre: 'Anillo de compromiso',   categoria: 'npc', precio: 35.04 },
+    { nombre: 'Pendiente de diamantes', categoria: 'npc', precio: 24.00 },
+    { nombre: 'Pendiente de rubís',     categoria: 'npc', precio: 4.86 },
+    { nombre: 'Cuadro lujoso 4',        categoria: 'npc', precio: 120.00 },
+    { nombre: 'Anillo de bodas',        categoria: 'npc', precio: 56.10 },
+    { nombre: 'Pendiente de perlas',    categoria: 'npc', precio: 2.76 },
+    { nombre: 'Biblia',                 categoria: 'npc', precio: 2.50 },
+    { nombre: 'Monedas antiguas',       categoria: 'npc', precio: 1.70 },
+    { nombre: 'Gafas de leer',          categoria: 'npc', precio: 6.00 },
+    { nombre: 'Jarrón de plata',        categoria: 'npc', precio: 5.50 },
+    { nombre: 'Pin de oro',             categoria: 'npc', precio: 2.50 },
+    { nombre: 'Gemelos',                categoria: 'npc', precio: 15.24 },
+    { nombre: 'Calomelano',             categoria: 'npc', precio: 0.95 },
 
-    /* ── ARTE Y ANTIGÜEDADES ─────────────────────────────── */
-    { nombre: 'Cuadro al Óleo',          categoria: 'arte', precio: 95.00 },
-    { nombre: 'Estatuilla de Bronce',    categoria: 'arte', precio: 85.00 },
-    { nombre: 'Estatuilla de Marfil',    categoria: 'arte', precio: 140.00 },
-    { nombre: 'Vasija Antigua',          categoria: 'arte', precio: 50.00 },
-    { nombre: 'Candelabro de Plata',     categoria: 'arte', precio: 70.00 },
-    { nombre: 'Figurita de Porcelana',   categoria: 'arte', precio: 45.00 },
-    { nombre: 'Jarra Decorativa',        categoria: 'arte', precio: 40.00 },
-    { nombre: 'Marco Dorado',            categoria: 'arte', precio: 35.00 },
+    /* ══════════════════════════════════════════════════════
+       ILEGALES / CRAFTEO PERISTA
+       precio = precio de VENTA al NPC (ganancia ya indicada)
+       Precio máx. de COMPRA: ver tabla crafteo
+       Negocia siempre por debajo del máximo
+    ══════════════════════════════════════════════════════ */
+    { nombre: 'Collar diamante (ilegal)',    categoria: 'ilegales', precio: 120.00 },
+    { nombre: 'Cuadro 1 (ilegal)',           categoria: 'ilegales', precio: 120.00 },
+    { nombre: 'Cuadro 2 (ilegal)',           categoria: 'ilegales', precio: 120.00 },
+    { nombre: 'Cuadro 3 (ilegal)',           categoria: 'ilegales', precio: 120.00 },
+    { nombre: 'Cuadro 4 (ilegal)',           categoria: 'ilegales', precio: 120.00 },
+    { nombre: 'Pendientes diamante',         categoria: 'ilegales', precio: 24.00 },
+    { nombre: 'Collar de oro (ilegal)',      categoria: 'ilegales', precio: 18.00 },
+    { nombre: 'Estatua fertilidad (ilegal)', categoria: 'ilegales', precio: 18.00 },
+    { nombre: 'Estatua (ilegal)',            categoria: 'ilegales', precio: 14.40 },
+    { nombre: 'Insignia (ilegal)',           categoria: 'ilegales', precio: 13.60 },
+    { nombre: 'Cuadro (ilegal)',             categoria: 'ilegales', precio: 12.00 },
+    { nombre: 'Reloj de pared (ilegal)',     categoria: 'ilegales', precio: 10.80 },
+    { nombre: 'Espejo (ilegal)',             categoria: 'ilegales', precio: 8.40 },
+    { nombre: 'Gafas',                       categoria: 'ilegales', precio: 6.00 },
+    { nombre: 'Pluma dorada',               categoria: 'ilegales', precio: 6.00 },
+    { nombre: 'Jarrón de plata (ilegal)',    categoria: 'ilegales', precio: 5.50 },
+    { nombre: 'Alianza (ilegal)',            categoria: 'ilegales', precio: 3.00 },
+    { nombre: 'Biblia (ilegal)',             categoria: 'ilegales', precio: 2.50 },
+    { nombre: 'Pin',                         categoria: 'ilegales', precio: 2.50 },
+    { nombre: 'Crucifijo (ilegal)',          categoria: 'ilegales', precio: 1.75 },
+    { nombre: 'Monedas (ilegal)',            categoria: 'ilegales', precio: 1.70 },
+    { nombre: 'Peine',                       categoria: 'ilegales', precio: 1.00 },
+    { nombre: 'Éter (ilegal)',               categoria: 'ilegales', precio: 0.95 },
+    { nombre: 'Calomelano (ilegal)',         categoria: 'ilegales', precio: 0.95 },
 
-    /* ── TABACO Y LICORES ────────────────────────────────── */
-    { nombre: 'Whisky Añejo',            categoria: 'tabaco', precio: 20.00 },
-    { nombre: 'Coñac Francés',           categoria: 'tabaco', precio: 30.00 },
-    { nombre: 'Puros Importados (caja)', categoria: 'tabaco', precio: 25.00 },
-    { nombre: 'Tabaco de Pipa',          categoria: 'tabaco', precio: 10.00 },
+    /* ══════════════════════════════════════════════════════
+       ARTÍCULOS GENERALES
+       precio = precio oficial del servidor (compra siempre por debajo)
+    ══════════════════════════════════════════════════════ */
+    { nombre: 'Jeringuilla de caballo',  categoria: 'articulos', precio: 2.07 },
+    { nombre: 'Cepillos de caballo',     categoria: 'articulos', precio: 2.13 },
+    { nombre: 'Jeringuilla mascotas',    categoria: 'articulos', precio: 1.71 },
+    { nombre: 'Transportín',             categoria: 'articulos', precio: 4.37 },
+    { nombre: 'Pipa',                    categoria: 'articulos', precio: 1.65 },
+    { nombre: 'Pipa tallada',            categoria: 'articulos', precio: 2.40 },
+    { nombre: 'Pipa calavera',           categoria: 'articulos', precio: 3.15 },
+    { nombre: 'Hacha',                   categoria: 'articulos', precio: 3.45 },
+    { nombre: 'Pala',                    categoria: 'articulos', precio: 3.45 },
+    { nombre: 'Pico',                    categoria: 'articulos', precio: 3.45 },
+    { nombre: 'Martillo',                categoria: 'articulos', precio: 3.45 },
+    { nombre: 'Linterna',                categoria: 'articulos', precio: 3.00 },
+    { nombre: 'Batea',                   categoria: 'articulos', precio: 2.55 },
+    { nombre: 'Cubo vacío',              categoria: 'articulos', precio: 1.80 },
+    { nombre: 'Fundidora',               categoria: 'articulos', precio: 12.57 },
+    { nombre: 'Alambique',               categoria: 'articulos', precio: 13.00 },
+    { nombre: 'Rastrillo',               categoria: 'articulos', precio: 3.50 },
+    { nombre: 'Prismáticos',             categoria: 'articulos', precio: 8.20 },
+    { nombre: 'Reloj de bolsillo',       categoria: 'articulos', precio: 15.15 },
+    { nombre: 'Cuchillo',                categoria: 'articulos', precio: 4.35 },
+    { nombre: 'Dardos',                  categoria: 'articulos', precio: 7.35 },
+    { nombre: 'Perfume mujer',           categoria: 'articulos', precio: 2.57 },
+    { nombre: 'Perfume hombre',          categoria: 'articulos', precio: 2.72 },
+    { nombre: 'Bomba de agua',           categoria: 'articulos', precio: 2.00 },
+    { nombre: 'Manguera de agua',        categoria: 'articulos', precio: 4.20 },
+    { nombre: 'Espantapájaros',          categoria: 'articulos', precio: 13.20 },
+    { nombre: 'Insecticida',             categoria: 'articulos', precio: 4.05 },
+    { nombre: 'Ramo de novia',           categoria: 'articulos', precio: 8.70 },
+    { nombre: 'Corona funeraria',        categoria: 'articulos', precio: 11.10 },
+    { nombre: 'Ramo silvestre',          categoria: 'articulos', precio: 7.50 },
+    { nombre: 'Ramo de rosas',           categoria: 'articulos', precio: 7.50 },
+    { nombre: 'Pepitas de oro',          categoria: 'articulos', precio: 0.30 },
+    { nombre: 'Mena de oro',             categoria: 'articulos', precio: 4.60 },
+    { nombre: 'Sal',                     categoria: 'articulos', precio: 0.07 },
 
-    /* ── PIELES Y TROFEOS ────────────────────────────────── */
-    { nombre: 'Piel de Oso Perfecto',    categoria: 'pieles', precio: 60.00 },
-    { nombre: 'Piel de Ciervo',          categoria: 'pieles', precio: 25.00 },
-    { nombre: 'Piel de Castor',          categoria: 'pieles', precio: 15.00 },
-    { nombre: 'Cornamenta de Alce',      categoria: 'pieles', precio: 40.00 },
-    { nombre: 'Colmillo de Jabalí',      categoria: 'pieles', precio: 18.00 },
+    /* ══════════════════════════════════════════════════════
+       CASA DE EMPEÑOS
+       precio = precio oficial (compra siempre por debajo)
+    ══════════════════════════════════════════════════════ */
+    { nombre: 'Mesa ping pong',          categoria: 'empenos', precio: 12.75 },
+    { nombre: 'Papel',                   categoria: 'empenos', precio: 0.08 },
+    { nombre: 'Fibra',                   categoria: 'empenos', precio: 0.20 },
+    { nombre: 'Palo de madera',          categoria: 'empenos', precio: 0.15 },
+    { nombre: 'Barril',                  categoria: 'empenos', precio: 1.10 },
+    { nombre: 'Pluma',                   categoria: 'empenos', precio: 0.15 },
+    { nombre: 'Mapa',                    categoria: 'empenos', precio: 2.00 },
+    { nombre: 'Mochila de superviviente',categoria: 'empenos', precio: 15.00 },
+    { nombre: 'Mochila de viajero',      categoria: 'empenos', precio: 20.00 },
+    { nombre: 'Fonógrafo',               categoria: 'empenos', precio: 20.40 },
+    { nombre: 'Mochila de cazador',      categoria: 'empenos', precio: 20.00 },
+    { nombre: 'Brújula',                 categoria: 'empenos', precio: 1.70 },
+    { nombre: 'Cámara avanzada',         categoria: 'empenos', precio: 20.40 },
+    { nombre: 'Mochila básica',          categoria: 'empenos', precio: 20.00 },
+    { nombre: 'Diario',                  categoria: 'empenos', precio: 2.00 },
+    { nombre: 'Cantimplora vacía',       categoria: 'empenos', precio: 3.40 },
+    { nombre: 'Mapa de pesca',           categoria: 'empenos', precio: 1.00 },
+    { nombre: 'Caña de pescar',          categoria: 'empenos', precio: 2.00 },
 
-    /* ── MERCANCÍA ESPECIAL ──────────────────────────────── */
-    { nombre: 'Documentos Falsos',       categoria: 'ilegales', precio: 250.00 },
-    { nombre: 'Mercancía Robada (lote)', categoria: 'ilegales', precio: 180.00 },
-    { nombre: 'Moneda Falsa (bolsa)',    categoria: 'ilegales', precio: 90.00 },
-    { nombre: 'Información Confidencial',categoria: 'ilegales', precio: 300.00 }
+    /* ══════════════════════════════════════════════════════
+       MATERIALES
+       precio = precio MÁXIMO que pagas a civiles
+       (empresas te venden más barato — úsalas primero)
+    ══════════════════════════════════════════════════════ */
+    { nombre: 'Sal',              categoria: 'materiales', precio: 0.10 },
+    { nombre: 'Grasa animal',     categoria: 'materiales', precio: 0.25 },
+    { nombre: 'Carbón',           categoria: 'materiales', precio: 0.20 },
+    { nombre: 'Piedra',           categoria: 'materiales', precio: 0.10 },
+    { nombre: 'Azufre',           categoria: 'materiales', precio: 0.20 },
+    { nombre: 'Palo de madera',   categoria: 'materiales', precio: 0.20 },
+    { nombre: 'Plantas',          categoria: 'materiales', precio: 0.20 },
+    { nombre: 'Fibra',            categoria: 'materiales', precio: 0.30 },
+    { nombre: 'Carne de pescado', categoria: 'materiales', precio: 0.50 },
+    { nombre: 'Carne de salmón',  categoria: 'materiales', precio: 0.60 },
+    { nombre: 'Carne de caza',    categoria: 'materiales', precio: 0.50 },
+    { nombre: 'Pepita de oro',    categoria: 'materiales', precio: 0.30 }
   ]
 };
