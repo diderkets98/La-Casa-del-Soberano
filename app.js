@@ -806,57 +806,57 @@ function moneyField(inp,key){
 moneyField(depositInput,'deposit');
 noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerChanged()});
 
-/* ══ PERISTA: destino de venta y precio de adquisición ══ */
+/* ══ PERISTA: barra NPC/Cliente + precio de adquisición ══ */
 (function(){
-  var destinoSel=document.getElementById('destinoVenta');
-  var precioAdqInp=document.getElementById('precioAdq');
-  var gananciaBox=document.getElementById('gananciaBox');
-  var gananciaVal=document.getElementById('gananciaVal');
+  var btnNPC=document.getElementById('peristaDestNPC');
+  var btnCliente=document.getElementById('peristaDestCliente');
+  var adqInp=document.getElementById('peristaAdq');
+  var gananciaBox=document.getElementById('peristaGanancia');
+  var gananciaVal=document.getElementById('peristaGananciaVal');
+  var gananciaLabel=document.getElementById('peristaGananciaLabel');
+  var destino='npc';
 
-  function parseMny(v){return Math.round(parseFloat(String(v).replace(',','.'))*100)/100||0}
-  function fmt(n){return '$'+n.toFixed(2)}
+  function parseMny(v){return parseFloat(String(v||'').replace(',','.'))||0}
+  function fmt(n){return '$'+Math.abs(n).toFixed(2)}
 
   function calcGanancia(){
-    var adq=parseMny(precioAdqInp?precioAdqInp.value:'');
-    var destino=destinoSel?destinoSel.value:'npc';
-    if(!adq||!gananciaBox||!gananciaVal){if(gananciaBox)gananciaBox.hidden=true;return;}
-
-    // Suma de precios del carrito (precio NPC o precio de venta)
+    var adq=parseMny(adqInp?adqInp.value:'');
+    if(!gananciaBox||!gananciaVal)return;
+    if(!adq){gananciaBox.hidden=true;return;}
     var total=0;
-    document.querySelectorAll('#cart .cart-row').forEach(function(row){
-      var sub=row.querySelector('.cr-sub');
-      if(sub){var v=parseFloat((sub.textContent||'').replace('$','').replace(',','.'));if(!isNaN(v))total+=v;}
+    document.querySelectorAll('#cart .cr-sub').forEach(function(el){
+      var v=parseFloat((el.textContent||'').replace(/[^0-9.,]/g,'').replace(',','.'));
+      if(!isNaN(v))total+=v;
     });
     if(!total){gananciaBox.hidden=true;return;}
-
-    var ganancia=total-adq;
-    gananciaVal.textContent=fmt(Math.abs(ganancia));
-    gananciaVal.className='ganancia-val'+(ganancia<0?' neg':'');
-    var label=gananciaBox.querySelector('span');
-    if(label){
-      if(destino==='npc') label.textContent='Ganancia al vender al NPC';
-      else label.textContent='Ganancia al vender al usuario';
-    }
+    var gan=total-adq;
+    gananciaVal.textContent=fmt(gan);
+    gananciaVal.className=gan<0?'neg':'';
+    if(gananciaLabel)gananciaLabel.textContent=destino==='npc'?'Ganancia al vender al NPC':'Ganancia al vender al cliente';
     gananciaBox.hidden=false;
   }
 
-  if(precioAdqInp){
-    precioAdqInp.addEventListener('input',function(){
-      var v=precioAdqInp.value.replace(/[^0-9.,]/g,'');
-      if(v!==precioAdqInp.value)precioAdqInp.value=v;
+  function setDestino(d){
+    destino=d;
+    if(btnNPC)btnNPC.classList.toggle('active',d==='npc');
+    if(btnCliente)btnCliente.classList.toggle('active',d==='cliente');
+    calcGanancia();
+  }
+
+  if(btnNPC)btnNPC.addEventListener('click',function(){setDestino('npc')});
+  if(btnCliente)btnCliente.addEventListener('click',function(){setDestino('cliente')});
+  if(adqInp){
+    adqInp.addEventListener('input',function(){
+      var v=adqInp.value.replace(/[^0-9.,]/g,'');
+      if(v!==adqInp.value)adqInp.value=v;
       calcGanancia();
     });
   }
-  if(destinoSel){
-    destinoSel.addEventListener('change',function(){
-      calcGanancia();
-    });
-  }
-  // Recalcula cuando cambia el carrito
   var obs=new MutationObserver(calcGanancia);
   var cartEl=document.getElementById('cart');
   if(cartEl)obs.observe(cartEl,{childList:true,subtree:true,characterData:true});
-  window._calcGananciaPerista=calcGanancia;
+  window._peristaDestino=function(){return destino};
+  window._peristaAdq=function(){return parseMny(adqInp?adqInp.value:'')};
 })();
 promiseInput.addEventListener('change',()=>{customer.promise=promiseInput.value;customerChanged()});
 nameInput.addEventListener('change',()=>{const c=clientes.find(x=>norm(x.name)===norm(nameInput.value.trim()));if(c)applyClient(c)});

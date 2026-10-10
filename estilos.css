@@ -1597,3 +1597,17 @@ img[data-failed]{visibility:hidden}
 .ganancia-box{margin:4px 0 8px;padding:8px 10px;border-radius:6px;background:#0d2a1a;border:1px dashed #3f7a52;font-size:15px;font-weight:bold;color:#d9ccaa}
 .ganancia-val{color:#4ecb82;font-size:17px}
 .ganancia-val.neg{color:#e05a5a}
+
+/* ── Barra Perista (NPC / Cliente + precio adquisición) ── */
+.perista-bar{background:#0d1f15;border:1px solid #2a4a2e;border-radius:0 0 8px 8px;padding:10px 14px;margin:-4px 0 10px;display:flex;flex-direction:column;gap:8px}
+.perista-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.perista-lbl{color:#a0b89a;font-size:13px;font-variant:small-caps;letter-spacing:.05em;min-width:90px}
+.perista-btns{display:flex;gap:6px}
+.perista-btn{padding:5px 14px;border-radius:20px;border:1px solid #3a5a3e;background:#132a1a;color:#c8b87a;font-size:13px;font-weight:bold;cursor:pointer;transition:background .15s,color .15s}
+.perista-btn.active{background:#2a5a34;color:#f0e0a0;border-color:#5a9a5e}
+.perista-money{display:flex;align-items:center;gap:4px}
+.perista-money i{color:#c8b87a;font-style:normal;font-size:15px}
+.perista-money input{width:100px;background:#0a1a0f;border:1px solid #3a5a3e;border-radius:4px;color:#f0e0a0;font-size:15px;padding:4px 8px;font-family:inherit}
+.perista-ganancia{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:6px;background:#0a2a15;border:1px dashed #3a7a44;font-size:14px;font-weight:bold;color:#a0c8a0}
+#peristaGananciaVal{font-size:17px;color:#4ecb82}
+#peristaGananciaVal.neg{color:#e05a5a}

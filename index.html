@@ -75,6 +75,25 @@
   <button type="button" class="mode-tab mat-tab" id="matTab"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h12l4-3h2v5h-3l-2 2H10l-1 4h3v2H5v-2h2l1-4H3z"/></svg>MATERIALES</button>
 </div>
 
+<!-- PERISTA: bloque NPC/Cliente debajo de las pestañas -->
+<div class="perista-bar" id="peristaBar">
+  <div class="perista-row">
+    <label class="perista-lbl">Destino</label>
+    <div class="perista-btns">
+      <button type="button" class="perista-btn active" id="peristaDestNPC">🏦 NPC</button>
+      <button type="button" class="perista-btn" id="peristaDestCliente">👤 Cliente</button>
+    </div>
+  </div>
+  <div class="perista-row">
+    <label class="perista-lbl" for="peristaAdq">Lo que pagué</label>
+    <div class="money perista-money"><i>$</i><input id="peristaAdq" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
+  </div>
+  <div class="perista-ganancia" id="peristaGanancia" hidden>
+    <span id="peristaGananciaLabel">Ganancia al vender al NPC</span>
+    <span id="peristaGananciaVal">$0.00</span>
+  </div>
+</div>
+
 <div class="grid">
 <section class="panel">
   <div class="search"><input id="search" placeholder="⌕  Buscar producto..." autocomplete="off"></div>
