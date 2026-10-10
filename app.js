@@ -436,8 +436,16 @@ async function doNew(){
  clearQuantities();resetSale();resetCustomer();calc(false);closeModal(receiptModal);
  say('Nueva venta preparada',undefined,snap?()=>{snap.q.forEach(([i,v])=>i.value=v);customer=Object.assign(defaultCustomer(),snap.c);renderCustomer();customerChanged();calc();say('Venta recuperada')}:null);
 }
-document.querySelectorAll('.plus').forEach(b=>b.onclick=()=>{const i=b.parentElement.querySelector('input');i.value=Math.min(MAX_QTY,readQty(i)+1);calc()});
-document.querySelectorAll('.minus').forEach(b=>b.onclick=()=>{const i=b.parentElement.querySelector('input');i.value=Math.max(0,readQty(i)-1);calc()});
+/* Botones +/- con delegación para que funcionen aunque las filas se inserten después */
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.plus,.minus');
+  if(!b)return;
+  var i=b.parentElement.querySelector('input[type="number"]');
+  if(!i)return;
+  if(b.classList.contains('plus'))i.value=Math.min(MAX_QTY,readQty(i)+1);
+  else i.value=Math.max(0,readQty(i)-1);
+  calc();
+});
 inputs.forEach(i=>{
  i.addEventListener('input',()=>calc());
  i.addEventListener('change',()=>{i.value=readQty(i);calc()});
