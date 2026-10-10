@@ -1660,139 +1660,65 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
 #pGanVal{font-size:16px;font-weight:bold}
 
 
-/* ══ TARJETA DE PRODUCTO (perista) ══════════════════════ */
+
+
+
+/* ══ TARJETA DE PRODUCTO ══════════════════════════════ */
+.product { border-bottom: 1px solid rgba(201,162,75,.15); }
 .p-card {
   display: flex;
-  gap: 12px;
-  padding: 10px 12px;
-  align-items: stretch;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
 }
 
-/* Imagen del producto */
+/* Imagen cuadrada a la izquierda */
 .p-card-img {
-  width: 72px;
-  height: 72px;
+  width: 68px;
+  height: 68px;
   flex-shrink: 0;
   border-radius: 6px;
-  background: rgba(201,162,75,.08);
-  border: 1px solid rgba(201,162,75,.25);
+  background: rgba(201,162,75,.07);
+  border: 1px solid rgba(201,162,75,.2);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 .p-card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 5px;
 }
 
-/* Cuerpo de la tarjeta */
+/* Cuerpo: nombre arriba, main abajo */
 .p-card-body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
-
-/* Fila superior: nombre + precios */
-.p-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.p-card-top .p-nombre {
+.p-card-body .p-nombre {
   font-size: .95em;
   font-weight: 600;
   color: var(--gold, #c9a24a);
-  line-height: 1.2;
-  flex: 1;
+  display: block;
 }
 
-/* Columna de precios (derecha) */
-.p-card-precios {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: flex-end;
-  flex-shrink: 0;
-}
-
-.p-precio-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.p-precio-lbl {
-  font-size: .68em;
-  letter-spacing: .04em;
-  color: #8a7d5a;
-  text-transform: uppercase;
-  min-width: 46px;
-  text-align: right;
-}
-
-/* Input de adquisición inline */
-.p-adq {
-  width: 70px;
-  background: rgba(0,0,0,.35);
-  border: 1px solid rgba(201,162,75,.35);
-  border-radius: 4px;
-  color: #e8d8a0;
-  font-size: .85em;
-  padding: 2px 5px;
-  text-align: right;
-  outline: none;
-}
-.p-adq:focus { border-color: #c9a24a; }
-
-/* Valor NPC */
-.p-npc-val {
-  font-size: .85em;
-  color: #c9a24a;
-  min-width: 60px;
-  text-align: right;
-}
-
-/* Ganancia por producto */
-.p-gan-val {
-  font-size: .85em;
-  font-weight: 700;
-  min-width: 60px;
-  text-align: right;
-  color: #8a7d5a;
-}
-.p-gan-val.positiva { color: #4ecb82; }
-.p-gan-val.negativa { color: #e05a5a; }
-
-/* Fila inferior: cantidad + subtotal */
-.p-card-bottom {
+/* Fila central: cantidad a la izquierda, precios a la derecha */
+.p-card-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-/* Controles de cantidad */
+/* Controles cantidad */
 .p-col-qty-val {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-.p-col-qty-val input[type="number"] {
-  width: 44px;
-  text-align: center;
-  background: rgba(0,0,0,.4);
-  border: 1px solid rgba(201,162,75,.3);
-  border-radius: 4px;
-  color: #e8d8a0;
-  font-size: 1em;
-  padding: 4px 2px;
 }
 .p-col-qty-val .minus,
 .p-col-qty-val .plus {
@@ -1802,26 +1728,90 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
   border: 1px solid rgba(201,162,75,.4);
   background: rgba(201,162,75,.1);
   color: #c9a24a;
-  font-size: 1.1em;
+  font-size: 1.15em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background .15s;
+  line-height: 1;
+  user-select: none;
 }
 .p-col-qty-val .minus:hover,
-.p-col-qty-val .plus:hover {
-  background: rgba(201,162,75,.25);
-}
-
-/* Subtotal */
-.product .subtotal {
+.p-col-qty-val .plus:hover { background: rgba(201,162,75,.28); }
+.p-col-qty-val input[type="number"] {
+  width: 42px;
+  text-align: center;
+  background: rgba(0,0,0,.4);
+  border: 1px solid rgba(201,162,75,.3);
+  border-radius: 4px;
+  color: #e8d8a0;
   font-size: .95em;
+  padding: 4px 2px;
+  -moz-appearance: textfield;
+}
+.p-col-qty-val input[type="number"]::-webkit-outer-spin-button,
+.p-col-qty-val input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* Columna de precios a la derecha */
+.p-card-precios {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.p-precio-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.p-precio-lbl {
+  font-size: .7em;
+  color: #8a7d5a;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+/* Input adquisición */
+.p-adq {
+  width: 68px;
+  background: rgba(0,0,0,.4);
+  border: 1px solid rgba(201,162,75,.3);
+  border-radius: 4px;
+  color: #e8d8a0;
+  font-size: .85em;
+  padding: 3px 6px;
+  text-align: right;
+  outline: none;
+}
+.p-adq:focus { border-color: #c9a24a; }
+/* Valor NPC */
+.p-npc-val {
+  font-size: .85em;
+  color: #c9a24a;
+  min-width: 60px;
+  text-align: right;
+}
+/* Ganancia — sola, sin label, verde/rojo */
+.p-gan-val {
+  font-size: .9em;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: right;
+  color: #6b5c30;
+}
+.p-gan-val.positiva { color: #4ecb82; }
+.p-gan-val.negativa { color: #e05a5a; }
+
+/* Subtotal abajo a la derecha */
+.product .subtotal {
+  font-size: .9em;
   font-weight: 700;
   color: #c9a24a;
+  text-align: right;
 }
 
-/* Ocultar header y cols viejos si quedan */
-.product .p-header { display: none; }
-.product .p-cols   { display: none; }
-/* ═══════════════════════════════════════════════════════ */
+/* Ocultar estructuras viejas */
+.product .p-header,
+.product .p-cols,
+.product .p-col { display: none; }
+/* ═══════════════════════════════════════════════════ */
