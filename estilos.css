@@ -1663,19 +1663,23 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
 
 
 
+
+
 /* ══ TARJETA DE PRODUCTO ══════════════════════════════ */
-.product { border-bottom: 1px solid rgba(201,162,75,.15); }
+.product {
+  border-bottom: 1px solid rgba(201,162,75,.15);
+}
+/* Card: imagen | cuerpo */
 .p-card {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   padding: 10px 14px;
 }
-
-/* Imagen cuadrada a la izquierda */
+/* Imagen cuadrada */
 .p-card-img {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
   border-radius: 6px;
   background: rgba(201,162,75,.07);
@@ -1690,31 +1694,32 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
   height: 100%;
   object-fit: cover;
 }
-
-/* Cuerpo: nombre arriba, main abajo */
+/* Cuerpo */
 .p-card-body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
+/* Nombre arriba */
 .p-card-body .p-nombre {
-  font-size: .95em;
+  font-size: .92em;
   font-weight: 600;
-  color: var(--gold, #c9a24a);
+  color: #c9a24a;
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
-/* Fila central: cantidad a la izquierda, precios a la derecha */
+/* Fila central: [- 0 +] a la izquierda, precios a la derecha */
 .p-card-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
-
-/* Controles cantidad */
+/* Botones cantidad */
 .p-col-qty-val {
   display: flex;
   align-items: center;
@@ -1722,23 +1727,25 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
 }
 .p-col-qty-val .minus,
 .p-col-qty-val .plus {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
   border: 1px solid rgba(201,162,75,.4);
   background: rgba(201,162,75,.1);
   color: #c9a24a;
-  font-size: 1.15em;
+  font-size: 1.2em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background .15s;
-  line-height: 1;
   user-select: none;
+  line-height: 1;
 }
 .p-col-qty-val .minus:hover,
-.p-col-qty-val .plus:hover { background: rgba(201,162,75,.28); }
+.p-col-qty-val .plus:hover {
+  background: rgba(201,162,75,.28);
+}
 .p-col-qty-val input[type="number"] {
   width: 42px;
   text-align: center;
@@ -1751,25 +1758,26 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
   -moz-appearance: textfield;
 }
 .p-col-qty-val input[type="number"]::-webkit-outer-spin-button,
-.p-col-qty-val input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-/* Columna de precios a la derecha */
+.p-col-qty-val input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+/* Columna precios — derecha */
 .p-card-precios {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 3px;
 }
 .p-precio-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .p-precio-lbl {
-  font-size: .7em;
-  color: #8a7d5a;
+  font-size: .68em;
+  color: #7a6b40;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: .05em;
 }
 /* Input adquisición */
 .p-adq {
@@ -1791,27 +1799,20 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
   min-width: 60px;
   text-align: right;
 }
-/* Ganancia — sola, sin label, verde/rojo */
+/* Ganancia: solo número, verde o rojo, sin label */
+.p-gan-row { justify-content: flex-end; }
 .p-gan-val {
-  font-size: .9em;
+  font-size: .92em;
   font-weight: 700;
   min-width: 60px;
   text-align: right;
-  color: #6b5c30;
+  color: transparent; /* vacío hasta que haya valor */
 }
 .p-gan-val.positiva { color: #4ecb82; }
 .p-gan-val.negativa { color: #e05a5a; }
-
-/* Subtotal abajo a la derecha */
-.product .subtotal {
-  font-size: .9em;
-  font-weight: 700;
-  color: #c9a24a;
-  text-align: right;
-}
-
-/* Ocultar estructuras viejas */
+/* Ocultar estructuras anteriores */
 .product .p-header,
 .product .p-cols,
-.product .p-col { display: none; }
+.product .p-col,
+.product .subtotal { display: none; }
 /* ═══════════════════════════════════════════════════ */
