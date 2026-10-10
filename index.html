@@ -98,16 +98,6 @@
   <div class="client-box">
     <label class="fld wide only-venta"><span>Tipo de operación</span>
       <select id="opType"><option value="venta">Venta normal</option><option value="encargo">Encargo</option></select></label>
-    <label class="fld wide only-venta"><span>Destino de la venta</span>
-      <select id="destinoVenta">
-        <option value="npc">Vender al NPC</option>
-        <option value="usuario">Vender a usuario</option>
-      </select></label>
-    <label class="fld wide only-venta" id="precioAdqWrap"><span>Precio de adquisición (lo que pagué)</span>
-      <div class="money"><i>$</i><input id="precioAdq" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off"></div></label>
-    <div class="brow ganancia-box only-venta" id="gananciaBox" hidden>
-      <span>Ganancia estimada</span><span id="gananciaVal" class="ganancia-val">$0.00</span>
-    </div>
     <label class="fld wide"><span>Tipo de cliente</span>
       <select id="clientType">
         <option value="particular">Cliente particular</option>
@@ -407,23 +397,7 @@
  var box=document.getElementById('products'), html='';
  prods.forEach(function(p){
   var c=cats.filter(function(k){return k.id===p.categoria})[0]||cats[0]||{id:'otros',nombre:'Otros'}, pr=(Math.round(Number(p.precio||0)*100)/100).toFixed(2);
-  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'" data-price-npc="'+pr+'">'+
-    '<div class="weapon-icon">✦</div>'+
-    '<div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>'+
-    '<div class="price" data-base="'+pr+'">$'+pr+'</div>'+
-    '<div class="perista-precios">'+
-      '<div class="perista-precio-row">'+
-        '<span class="perista-precio-lbl" id="lbl-adq-'+x(p.nombre).replace(/[^a-z0-9]/gi,\'_\')+'">Compré a</span>'+
-        '<div class="perista-precio-inp"><i>$</i><input class="perista-adq-inp" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" tabindex="-1"></div>'+
-      '</div>'+
-      '<div class="perista-precio-row perista-venta-row">'+
-        '<span class="perista-precio-lbl">Vendo a</span>'+
-        '<div class="perista-precio-inp"><i>$</i><input class="perista-venta-inp" type="text" inputmode="decimal" placeholder="'+pr+'" autocomplete="off" tabindex="-1" data-default="'+pr+'"></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="qty"><button class="minus" aria-label="Restar">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"><button class="plus" aria-label="Sumar">+</button></div>'+
-    '<div class="subtotal">$0.00</div>'+
-  '</div>\n';
+  html+='<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'">\n      <div class="weapon-icon">✦</div>\n      <div class="pname">'+x(p.nombre)+'<small>'+x(c.nombre)+'</small></div>\n      <div class="price">$'+pr+'</div>\n      <div class="qty"><button class="minus" aria-label="Restar">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"><button class="plus" aria-label="Sumar">+</button></div>\n      <div class="subtotal">$0.00</div>\n    </div>\n';
  });
  box.insertAdjacentHTML('afterbegin',html);
 })();
