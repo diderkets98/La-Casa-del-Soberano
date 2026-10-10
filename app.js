@@ -233,6 +233,8 @@ function calc(animate=true){
   const pe=row.querySelector('.price'), bc=baseCents(i), ec=priceCents(i), ptxt=ec!==bc?`<small class="was">${money(bc)}</small>${money(ec)}`:money(ec);
   if(pe.dataset.v!==ptxt){pe.innerHTML=ptxt;pe.dataset.v=ptxt}
   row.classList.toggle('has-qty',q>0);
+  var ganEl=row.querySelector('.p-gan-val');
+  if(ganEl){var adqV=parseFloat(String((row.querySelector('.p-adq')||{}).value||'').replace(',','.'))||0,npcV=parseFloat(row.dataset.npc)||0;if(adqV>0){var gan=npcV-adqV;ganEl.textContent=(gan>=0?'+ $':'− $')+Math.abs(gan).toFixed(2);ganEl.className='p-gan-val '+(gan>=0?'positiva':'negativa');}else{ganEl.textContent='—';ganEl.className='p-gan-val';}}
   totalCents+=sub;units+=q;if(q>0)products++;
  });
  const fin=computeFin();renderFin(fin);
