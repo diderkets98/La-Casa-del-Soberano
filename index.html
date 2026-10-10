@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <title>La Casa del Soberano · Saint Denis</title>
-<link rel="stylesheet" href="estilos.css?v=1.0.0">
+<link rel="stylesheet" href="estilos.css?v=1.0.2">
 <link rel="preload" as="image" href="entrada-fachada.webp" media="(max-aspect-ratio: 23/20)">
 <link rel="preload" as="image" href="entrada-fachada-ancha.webp" media="(min-aspect-ratio: 23/20)">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -385,7 +385,7 @@
   </div>
 </div>
 
-<script src="tienda.js?v=1.0.0"></script>
+<script src="tienda.js?v=1.0.2"></script>
 <script>
 /* ===== Catálogo de la tienda: se construye a partir de tienda.js (categorías y productos) ===== */
 (function(){
@@ -404,10 +404,7 @@
         '<small class="p-cat">'+x(c.nombre)+'</small>'+
       '</div>'+
       '<div class="p-cols">'+
-        '<div class="p-col">'+
-          '<div class="p-col-lbl">Adquisición</div>'+
-          '<div class="p-col-val"><input class="p-adq" type="text" inputmode="decimal" placeholder="0.00" data-name="'+x(p.nombre)+'"></div>'+
-        '</div>'+
+
         '<div class="p-col p-col-mid">'+
           '<div class="p-col-lbl">Cantidad</div>'+
           '<div class="p-col-val p-col-qty-val"><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
@@ -424,6 +421,6 @@
  box.insertAdjacentHTML('afterbegin',html);
 })();
 </script>
-<script src="app.js?v=1.0.0"></script>
+<script src="app.js?v=1.0.2"></script>
 </body>
 </html>
