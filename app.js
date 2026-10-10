@@ -889,6 +889,7 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
 
   document.addEventListener('input',function(e){
     var t=e.target;
+    if(t.classList.contains('p-adq')){calc();}
     if(!t.classList.contains('p-adq')&&!t.classList.contains('p-venta'))return;
     t.value=t.value.replace(/[^0-9.,]/g,'');
     var prod=t.closest?t.closest('.product'):null;
