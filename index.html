@@ -90,6 +90,16 @@
   <div class="client-box">
     <label class="fld wide only-venta"><span>Tipo de operación</span>
       <select id="opType"><option value="venta">Venta normal</option><option value="encargo">Encargo</option></select></label>
+    <label class="fld wide only-venta"><span>Destino de la venta</span>
+      <select id="destinoVenta">
+        <option value="npc">Vender al NPC</option>
+        <option value="usuario">Vender a usuario</option>
+      </select></label>
+    <label class="fld wide only-venta" id="precioAdqWrap"><span>Precio de adquisición (lo que pagué)</span>
+      <div class="money"><i>$</i><input id="precioAdq" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off"></div></label>
+    <div class="brow ganancia-box only-venta" id="gananciaBox" hidden>
+      <span>Ganancia estimada</span><span id="gananciaVal" class="ganancia-val">$0.00</span>
+    </div>
     <label class="fld wide"><span>Tipo de cliente</span>
       <select id="clientType">
         <option value="particular">Cliente particular</option>
