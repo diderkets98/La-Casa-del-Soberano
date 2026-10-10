@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <title>La Casa del Soberano · Saint Denis</title>
-<link rel="stylesheet" href="estilos.css?v=1.0.2">
+<link rel="stylesheet" href="estilos.css?v=1.0.3">
 <link rel="preload" as="image" href="entrada-fachada.webp" media="(max-aspect-ratio: 23/20)">
 <link rel="preload" as="image" href="entrada-fachada-ancha.webp" media="(min-aspect-ratio: 23/20)">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -385,7 +385,7 @@
   </div>
 </div>
 
-<script src="tienda.js?v=1.0.2"></script>
+<script src="tienda.js?v=1.0.3"></script>
 <script>
 /* ===== Catálogo de la tienda: se construye a partir de tienda.js (categorías y productos) ===== */
 (function(){
@@ -399,28 +399,35 @@
   var c=cats.filter(function(k){return k.id===p.categoria})[0]||cats[0]||{id:'otros',nombre:'Otros'}, pr=(Math.round(Number(p.precio||0)*100)/100).toFixed(2);
   html+=
     '<div class="product" data-cat="'+x(c.id)+'" data-name="'+x(String(p.nombre).toLowerCase())+'" data-npc="'+pr+'">'+
-      '<div class="p-header">'+
-        '<span class="p-nombre">'+x(p.nombre)+'</span>'+
-        '<small class="p-cat">'+x(c.nombre)+'</small>'+
-      '</div>'+
-      '<div class="p-cols">'+
-
-        '<div class="p-col p-col-mid">'+
-          '<div class="p-col-lbl">Cantidad</div>'+
-          '<div class="p-col-val p-col-qty-val"><input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
-          '<div class="p-col-btn-mid"><button class="minus" aria-label="Restar">−</button><button class="plus" aria-label="Sumar">+</button></div>'+
+      '<div class="p-card">'+
+        '<div class="p-card-img">'+
+          '<img src="icono-'+x(c.id)+'.webp" alt="" onerror="this.style.display=\'none\'">'+
         '</div>'+
-        '<div class="p-col">'+
-          '<div class="p-col-lbl p-venta-lbl">Venta al NPC</div>'+
-          '<div class="p-col-val"><input class="p-venta" type="text" inputmode="decimal" placeholder="'+pr+'" data-default="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
+        '<div class="p-card-body">'+
+          '<div class="p-card-top">'+
+            '<span class="p-nombre">'+x(p.nombre)+'</span>'+
+            '<div class="p-card-precios">'+
+              '<div class="p-precio-row"><span class="p-precio-lbl">Adq.</span><input class="p-adq" type="text" inputmode="decimal" placeholder="0.00" data-name="'+x(p.nombre)+'"></div>'+
+              '<div class="p-precio-row"><span class="p-precio-lbl p-venta-lbl">NPC</span><span class="p-npc-val">$'+pr+'</span></div>'+
+              '<div class="p-precio-row p-ganancia-row"><span class="p-precio-lbl">Ganancia</span><span class="p-gan-val">—</span></div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="p-card-bottom">'+
+            '<div class="p-col-qty-val">'+
+              '<button class="minus" aria-label="Restar">−</button>'+
+              '<input type="number" min="0" step="1" value="0" inputmode="numeric" data-price="'+pr+'" data-name="'+x(p.nombre)+'">'+
+              '<button class="plus" aria-label="Sumar">+</button>'+
+            '</div>'+
+            '<div class="subtotal">$0.00</div>'+
+          '</div>'+
         '</div>'+
       '</div>'+
-      '<div class="subtotal">$0.00</div>'+
+      '<input class="p-venta" type="hidden" placeholder="'+pr+'" data-default="'+pr+'" data-name="'+x(p.nombre)+'">'+
     '</div>';
  });
  box.insertAdjacentHTML('afterbegin',html);
 })();
 </script>
-<script src="app.js?v=1.0.2"></script>
+<script src="app.js?v=1.0.3"></script>
 </body>
 </html>
