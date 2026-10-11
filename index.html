@@ -62,7 +62,7 @@
 <div class="goal-bar" id="goalBar" hidden></div>
 <div class="emp-week" id="empWeek" hidden></div>
 
-<nav class="cat-nav" aria-label="Categorías"></nav>
+<nav class="cat-nav" id="catNav" aria-label="Categorías"></nav>
 
 <div class="category-visual" id="categoryVisual">
   <img id="categoryImage" data-src="cabecera-catalogo.webp" alt="Catálogo">
@@ -391,7 +391,7 @@
 (function(){
  var T=window.TIENDA||{}, cats=T.categorias||[], prods=T.productos||[];
  function x(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
- var nav=document.querySelector('.cat-nav');
+ var nav=document.getElementById('catNav');
  var btn=function(id,name,img,on){return '<button type="button" class="cat-btn'+(on?' active':'')+'" data-cat="'+x(id)+'" aria-pressed="'+(on?'true':'false')+'" title="'+x(name)+'"><img src="'+x(img)+'" alt="'+x(name)+'" onerror="this.parentNode.classList.add(\'noimg\')"><span class="cat-txt">'+x(name)+'</span></button>'};
  nav.innerHTML=btn('todos','Todos','boton-todos.webp',true)+cats.map(function(c){return btn(c.id,c.nombre,c.boton||('boton-'+c.id+'.webp'),false)}).join('');
  var box=document.getElementById('products'), html='';
