@@ -1456,7 +1456,7 @@ function logBuy(buy){
 
 function renderModCompras(){
   const a=loadLog(KEY_BUYLOG).slice().reverse().slice(0,200);
-  return `<div class="dir-sec-title" style="margin-top:0">COMPRAS REGISTRADAS (${a.length})</div>${searchBox('⌕  Buscar por vendedor, empleado o número…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm([r.id,r.vendedor,r.employee,r.date].join(' '))))}"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}<br>Vendedor: ${esc(r.vendedor||'—')}<br>Empleado: ${esc(r.employee||'—')}<br>${summaryText(r.products,r.units)}${r.note?'<br>Nota: '+esc(r.note):''}<br>Total pagado: ${money(r.totalCents)}</div>`).join(''):'<div class="enc-empty">Todavía no hay compras registradas.<br>Se guardan al finalizar cada compra.</div>')+'</div>';
+  return `<div class="dir-sec-title" style="margin-top:0">COMPRAS REGISTRADAS (${a.length})</div>${searchBox('⌕  Buscar por vendedor, empleado o número…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm([r.id,r.vendedor,r.employee,r.date].join(' ')))}"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}<br>Vendedor: ${esc(r.vendedor||'—')}<br>Empleado: ${esc(r.employee||'—')}<br>${summaryText(r.products,r.units)}${r.note?'<br>Nota: '+esc(r.note):''}<br>Total pagado: ${money(r.totalCents)}</div>`).join(''):'<div class="enc-empty">Todavía no hay compras registradas.<br>Se guardan al finalizar cada compra.</div>')+'</div>';
 }
 
 function finishBuyAction(){
