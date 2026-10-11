@@ -234,18 +234,7 @@ function calc(animate=true){
   if(pe.dataset.v!==ptxt){pe.innerHTML=ptxt;pe.dataset.v=ptxt}
   row.classList.toggle('has-qty',q>0);
   var ganEl=row.querySelector('.p-gan-val');
-  if(ganEl){
-    var adqV=parseFloat(String((row.querySelector('.p-adq')||{}).value||'').replace(',','.'))||0;
-    var npcV=parseFloat(row.dataset.npc)||0;
-    if(adqV>0){
-      var gan=npcV-adqV;
-      ganEl.textContent='$'+Math.abs(gan).toFixed(2);
-      ganEl.className='p-gan-val '+(gan>=0?'positiva':'negativa');
-    } else {
-      ganEl.textContent='';
-      ganEl.className='p-gan-val';
-    }
-  }
+  if(ganEl){var adqV=parseFloat(String((row.querySelector('.p-adq')||{}).value||'').replace(',','.'))||0,npcV=parseFloat(row.dataset.npc)||0;if(adqV>0){var gan=npcV-adqV;ganEl.textContent=(gan>=0?'+ $':'− $')+Math.abs(gan).toFixed(2);ganEl.className='p-gan-val '+(gan>=0?'positiva':'negativa');}else{ganEl.textContent='—';ganEl.className='p-gan-val';}}
   totalCents+=sub;units+=q;if(q>0)products++;
  });
  const fin=computeFin();renderFin(fin);
@@ -2097,7 +2086,7 @@ function saveCierre(){
 }
 /* --- Discord --- */
 function renderModDiscord(){
- const E=[['ventas','Ventas: ticket al finalizar y registro semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['encargos','Encargos: creación, entrega y cancelación (con el ticket)'],['fichajes','Fichajes de entrada y salida'],['gastos','Gastos: al guardarlos y registro semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['balance','Balance de cuentas semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['pedidos','Pedidos a proveedores: al emitirlos, completarlos o cancelarlos'],['empleados','Empleados: imagen del contrato al incorporar a alguien'],['clientes','Clientes: ficha al crearlo, se actualiza al modificarlo'],['proveedores','Proveedores: ficha y lista de precios, se actualiza al modificarla'],['stock','Stock de productos: un mensaje que se actualiza en tiempo real (ventas, fabricación, anulaciones)'],['materiales','Almacén de materiales: un mensaje que se actualiza en tiempo real (pedidos recibidos y fabricación)'],['resumen','Resumen del día: al fichar la salida el último empleado'],['ausencias','Ausencias: cuando alguien avisa, vuelve o la anula (con el motivo)'],['sueldos','Sueldos: resumen de toda la semana al pagar el último sueldo'],['mensual','Resumen mensual: el día 1 de cada mes, el mes anterior entero (ventas, gastos, beneficio, mejor vendedor, lo más vendido y comparación con el mes anterior)'],['anulaciones','Anulaciones de ventas'],['cierres','Cierres de caja']];
+ const E=[['ventas','Ventas: ticket al finalizar y registro semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['encargos','Encargos: creación, entrega y cancelación (con el ticket)'],['fichajes','Fichajes de entrada y salida'],['gastos','Gastos: al guardarlos y registro semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['balance','Balance de cuentas semanal (solo los jueves a las 22:00, o al pulsar «Enviar a Discord»)'],['pedidos','Pedidos a proveedores: al emitirlos, completarlos o cancelarlos'],['empleados','Empleados: imagen del contrato al incorporar a alguien'],['clientes','Clientes: ficha al crearlo, se actualiza al modificarlo'],['proveedores','Proveedores: ficha y lista de precios, se actualiza al modificarla'],['stock','Stock de productos: un mensaje que se actualiza en tiempo real (ventas, compras, anulaciones)'],['materiales','Almacén de materiales: un mensaje que se actualiza en tiempo real (pedidos recibidos y ajustes de stock)'],['resumen','Resumen del día: al fichar la salida el último empleado'],['ausencias','Ausencias: cuando alguien avisa, vuelve o la anula (con el motivo)'],['sueldos','Sueldos: resumen de toda la semana al pagar el último sueldo'],['mensual','Resumen mensual: el día 1 de cada mes, el mes anterior entero (ventas, gastos, beneficio, mejor vendedor, lo más vendido y comparación con el mes anterior)'],['anulaciones','Anulaciones de ventas'],['cierres','Cierres de caja']];
  return dcBoxHTML()+`<p class="bk-note">Cada tipo de aviso puede ir a su <b>propio canal</b>: crea un webhook por canal y pégalo en «canal propio». Los que dejes vacíos usan el <b>canal general</b>. Se configura una vez en cada dispositivo (o importa la «configuración» desde Copia de seguridad).</p>
   <div class="dir-form enc-sec"><label>CANAL GENERAL (POR DEFECTO)<input id="whUrl" type="text" autocomplete="off" spellcheck="false" placeholder="https://discord.com/api/webhooks/..." value="${esc(webhook.url)}"></label>
   ${E.map(([k,l])=>`<div class="wh-row"><label class="chk"><input type="checkbox" data-ev="${k}"${webhook.ev[k]?' checked':''}>${l}</label><input class="wh-own" type="text" data-whu="${k}" autocomplete="off" spellcheck="false" placeholder="Canal propio (opcional): https://discord.com/api/webhooks/..." value="${esc(webhook.urls[k]||'')}"></div>`).join('')}
@@ -3587,14 +3576,14 @@ async function contractBlob(e){
  }catch(x){return null}
 }
 function renderModStock(){
- const cats=[...document.querySelectorAll('.cat-nav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"></button>`).join('');
+ const cats=[...document.querySelectorAll('.cat-nav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
  const rows=inputs.map((inp,idx)=>({inp:inp,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>stockCat==='todos'||x.cat===stockCat).map(x=>{
   const n=x.inp.dataset.name;
   const rc=recipeText(n);
   return `<div class="stock-row"><div><b><span class="dot ${dotCls(n)}"></span>${esc(n)}</b>${rc?`<small class="rc">Receta: ${esc(rc)}</small>`:''}<small>Stock actual: ${stockMap[n]||0}${(stockMin[n]||0)>0&&(stockMap[n]||0)<=(stockMin[n]||0)?' <span class="lowtag">BAJO</span>':''}</small><label class="minlbl">Mínimo <input class="min-in" type="text" inputmode="numeric" data-min="${esc(n)}" value="${esc(minDraft[n]!==undefined?minDraft[n]:(stockMin[n]||''))}" placeholder="0" aria-label="Stock mínimo"></label></div><div class="qty stock-qty"><button type="button" data-dir="sminus:${x.idx}" aria-label="Quitar una unidad">−</button><input type="text" inputmode="numeric" data-stock="${esc(n)}" value="${esc(stockDraft[n]||'0')}" aria-label="Unidades a añadir"><button type="button" data-dir="splus:${x.idx}" aria-label="Añadir una unidad">+</button></div></div>`;
  }).join('');
  const lf=lastFab();
- return `${lf?`<div class="enc-actions" style="margin-bottom:8px"><button type="button" class="warn" data-dir="fab-undo">↶ DESHACER ÚLTIMA FABRICACIÓN (${esc(lf.items.map(x=>x.delta+' × '+x.producto).join(', '))} · ${ago(lf.ts)})</button></div>`:''}<p class="bk-note">Al sumar unidades de un producto con receta (Dirección → FABRICACIÓN) se gastan sus materiales del almacén. Antes te pide confirmación, y durante ${UNDO_MIN} minutos puedes deshacerlo. Si falta algún material, no se suma nada.</p><div class="cat-nav stock-cats">${cats}</div>${rows}<div class="pay-err" id="stErr" hidden></div><div class="enc-actions" style="margin-top:12px"><button type="button" class="primary" data-dir="stock-save">GUARDAR STOCK</button></div>`;
+ return `${lf?`<div class="enc-actions" style="margin-bottom:8px"><button type="button" class="warn" data-dir="fab-undo">↶ DESHACER ÚLTIMO AJUSTE (${esc(lf.items.map(x=>x.delta+' × '+x.producto).join(', '))} · ${ago(lf.ts)})</button></div>`:''}<p class="bk-note">Aquí puedes actualizar el stock de cada producto manualmente. Introduce las unidades disponibles y pulsa GUARDAR STOCK.</p><div class="cat-nav stock-cats">${cats}</div>${rows}<div class="pay-err" id="stErr" hidden></div><div class="enc-actions" style="margin-top:12px"><button type="button" class="primary" data-dir="stock-save">GUARDAR STOCK</button></div>`;
 }
 function renderModRegistroStock(){
  const low=lowStock();
@@ -3643,7 +3632,7 @@ async function undoFab(){
  try{localStorage.removeItem('tienda_lastfab')}catch(e){}
  renderDir();calc(false);say('Fabricación deshecha');
 }
-const DIR_SECCIONES=[['VENTAS Y CAJA',['ventas','semanales','estadisticas','gastos','sueldos','objetivo','balance','cierre']],['CATÁLOGO, PRECIOS Y CONVENIOS',['productos','convenios']],['ALMACÉN Y FABRICACIÓN',['stock','fabricacion','regstock']],['PROVEEDORES',['proveedores','nuevopedido','regpedidos']],['PERSONAL',['empleados','horarios','ausencias']],['CLIENTES',['clientes']],['SISTEMA',['revision','historial','discord','nube','copia','reset']]];
+const DIR_SECCIONES=[['VENTAS Y CAJA',['ventas','semanales','estadisticas','gastos','sueldos','objetivo','balance','cierre']],['CATÁLOGO, PRECIOS Y CONVENIOS',['productos','convenios']],['ALMACÉN Y STOCK',['stock','fabricacion','regstock']],['PROVEEDORES',['proveedores','nuevopedido','regpedidos']],['PERSONAL',['empleados','horarios','ausencias']],['CLIENTES',['clientes']],['SISTEMA',['revision','historial','discord','nube','copia','reset']]];
 let dirLast=null;
 document.getElementById('dirModal').addEventListener('toggle',e=>{const d=e.target;if(!d.matches||!d.matches('details.mod-sec'))return;let st={};try{st=JSON.parse(localStorage.getItem('tienda_dirsec')||'{}')}catch(x){}if(d.open)st[d.dataset.sec]=1;else delete st[d.dataset.sec];try{localStorage.setItem('tienda_dirsec',JSON.stringify(st))}catch(x){}},true);
 function renderDir(){
