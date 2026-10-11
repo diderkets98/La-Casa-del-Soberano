@@ -1,4 +1,4 @@
-/* MI TIENDA · app.js · versión 1.0.0
+/* LA CASA DEL SOBERANO · app.js · versión 1.0.0
    El programa de la web. Los productos y la base de datos se configuran en tienda.js. */
 /* ===== MODO PRUEBA (Ayudante de Pruebas) =====
    Si esta pestaña está en modo prueba, nada sale de este móvil: la nube y Discord se simulan en memoria.
@@ -331,7 +331,7 @@ function dueLabel(s){return s.kind==='senal'?'PENDIENTE AL RECOGER':s.kind==='pr
 function dueCents(s){return s.kind?s.pendingCents:s.totalCents}
 function receiptText(s){
  const line='────────────────────', enc=s.op==='encargo';
- const out=['MI TIENDA',enc?'REGISTRO DE ENCARGO':'REGISTRO DE VENTA','Mi Ciudad · 1880','',(enc?'Encargo: ':'Venta: ')+s.id,'Fecha: '+s.date,'Hora: '+s.time];
+ const out=['LA CASA DEL SOBERANO',enc?'REGISTRO DE ENCARGO':'REGISTRO DE VENTA','Saint Denis · 1880','',(enc?'Encargo: ':'Venta: ')+s.id,'Fecha: '+s.date,'Hora: '+s.time];
  if(s.employee)out.push('Empleado: '+s.employee);
  if(s.client)out.push('Cliente: '+s.client);
  if(s.telegram)out.push('Telegrama: '+s.telegram);
@@ -530,7 +530,7 @@ const categoryVisuals={todos:{image:'cabecera-catalogo.webp',title:'Catálogo'}}
 function updateCategoryVisual(){
  const v=categoryVisuals[cat]||categoryVisuals.todos;
  document.getElementById('categoryImage').src=catImg(v.image);
- document.getElementById('categoryImage').alt=v.title+' · Mi Tienda';
+ document.getElementById('categoryImage').alt=v.title+' · La Casa del Soberano';
  document.getElementById('categoryTitle').textContent=v.title;
 }
 function filter(){
@@ -825,6 +825,7 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
  document.body.addEventListener('classchange',()=>{});
  const peristaBar=document.getElementById('peristaBar');
  function updatePeristaBar(){if(peristaBar)peristaBar.hidden=appMode==='compra';}
+  updatePeristaBar();
 
   function parseMny(v){return parseFloat(String(v||'').replace(',','.'))||0}
   function fmt(n){return(n<0?'−':'')+' $'+Math.abs(n).toFixed(2)}
@@ -1034,17 +1035,17 @@ function stepsHTML(e){
 function plainCaps(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()}
 function encItemsTxt(e){return (e.items||[]).map(i=>i.qty+' × '+i.name).join(', ')}
 function telegramText(e){
- return `Nos complace anunciarle, Sr./Sra. ${e.client}, que su encargo en Mi Tienda ya está fabricado (${encItemsTxt(e)}).${e.pendingCents>0?`\n\nImporte pendiente al recogerlo: ${money(e.pendingCents)}.`:''}\n\nPuede pasar a recogerlo cuando quiera. Dispone de un plazo de 10 días para hacerlo: transcurrido ese plazo, perderá el producto y el dinero depositado como fianza.\n\nTu lema aquí.`;
+ return `Nos complace anunciarle, Sr./Sra. ${e.client}, que su encargo en La Casa del Soberano ya tiene preparado su encargo (${encItemsTxt(e)}).${e.pendingCents>0?`\n\nImporte pendiente al recogerlo: ${money(e.pendingCents)}.`:''}\n\nPuede pasar a recogerlo cuando quiera. Dispone de un plazo de 10 días para hacerlo: transcurrido ese plazo, perderá el producto y el dinero depositado como fianza.\n\nTu lema aquí.`;
 }
 function telegramConfirm(e){
- return `Sr./Sra. ${e.client}: le confirmamos su encargo en Mi Tienda, Mi Ciudad.\n\n${encItemsTxt(e)}\nTotal: ${money(e.totalCents)} · Fianza pagada: ${money(e.depositCents)} · Pendiente al recoger: ${money(e.pendingCents)}.${e.promise?`\nFecha prevista: ${fmtISO(e.promise)}.`:''}\n\nLe avisaremos por telegrama en cuanto esté listo.\n\nTu lema aquí.`;
+ return `Sr./Sra. ${e.client}: le confirmamos su encargo en La Casa del Soberano, Saint Denis\n\n${encItemsTxt(e)}\nTotal: ${money(e.totalCents)} · Fianza pagada: ${money(e.depositCents)} · Pendiente al recoger: ${money(e.pendingCents)}.${e.promise?`\nFecha prevista: ${fmtISO(e.promise)}.`:''}\n\nLe avisaremos por telegrama en cuanto esté listo.\n\nTu lema aquí.`;
 }
 function telegramRemind(e){
- return `Sr./Sra. ${e.client}: le recordamos que su encargo (${encItemsTxt(e)}) le espera en Mi Tienda, Mi Ciudad.${e.pendingCents>0?` Importe pendiente: ${money(e.pendingCents)}.`:''}\n\nRecuerde que dispone de 10 días desde el aviso para recogerlo; pasado ese plazo, perderá el producto y la fianza.\n\nTu lema aquí.`;
+ return `Sr./Sra. ${e.client}: le recordamos que su encargo (${encItemsTxt(e)}) le espera en La Casa del Soberano, Saint Denis.${e.pendingCents>0?` Importe pendiente: ${money(e.pendingCents)}.`:''}\n\nRecuerde que dispone de 10 días desde el aviso para recogerlo; pasado ese plazo, perderá el producto y la fianza.\n\nTu lema aquí.`;
 }
 function pedidoTelegram(prov,items,paid,code){
  const tot=items.reduce((a,x)=>a+x.qty*x.price,0);
- return `Mi Tienda, Mi Ciudad.\nPedido para ${prov}:\n\n${items.map(x=>`• ${x.qty} × ${x.material} a ${money(x.price)} = ${money(x.qty*x.price)}`).join('\n')}\n\nTotal: ${money(tot)}. ${paid?'Pagado por adelantado.':'Se paga a la entrega.'}${code?`\nReferencia: ${code}`:''}\n\nTu lema aquí.`;
+ return `La Casa del Soberano, Saint Denis.\nPedido para ${prov}:\n\n${items.map(x=>`• ${x.qty} × ${x.material} a ${money(x.price)} = ${money(x.qty*x.price)}`).join('\n')}\n\nTotal: ${money(tot)}. ${paid?'Pagado por adelantado.':'Se paga a la entrega.'}${code?`\nReferencia: ${code}`:''}\n\nTu lema aquí.`;
 }
 async function copyMsg(t,ok){if(await copyText(t))say(ok||'Mensaje copiado · pégalo en el telegrama');else prompt('Copia este texto:',t)}
 async function copyTelegram(id){
@@ -1558,7 +1559,7 @@ function empLines(e,type){
 }
 function weekDoc(list,type,ws){
  const line='────────────────────', now=Date.now();
- const out=['MI TIENDA',type==='ventas'?'REGISTRO SEMANAL DE VENTAS':'REGISTRO SEMANAL DE FICHAJES','Mi Ciudad · 1880','','Semana: '+dayStr(ws)+' – '+dayStr(ws+6),'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
+ const out=['LA CASA DEL SOBERANO',type==='ventas'?'REGISTRO SEMANAL DE VENTAS':'REGISTRO SEMANAL DE FICHAJES','Saint Denis · 1880','','Semana: '+dayStr(ws)+' – '+dayStr(ws+6),'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  list.forEach(e=>{out.push(line,'EMPLEADO: '+e.name,line,'');empLines(e,type).forEach(x=>out.push(x));out.push('')});
  out.push(line,'','Tu lema aquí.');
  return out.join('\n');
@@ -1580,7 +1581,7 @@ function renderModSemanales(){
  if(!wkType)return '<button type="button" class="enc-card" data-dir="wk-type:ventas"><div class="t">REGISTRO DE VENTAS</div><div class="it">Ventas semanales de cada empleado.</div></button><button type="button" class="enc-card" data-dir="wk-type:compras"><div class="t">REGISTRO DE COMPRAS</div><div class="it">Compras semanales registradas.</div></button><button type="button" class="enc-card" data-dir="wk-type:fichajes"><div class="t">REGISTRO DE FICHAJE</div><div class="it">Horas fichadas cada semana por empleado.</div></button>';
  const wd=weekData(), ven=wkType==='ventas', comp=wkType==='compras';
  const nav=`<div style="display:grid;grid-template-columns:48px 1fr 48px;gap:8px;margin-bottom:10px" class="enc-actions"><button type="button" data-dir="wk-prev" aria-label="Semana anterior">◂</button><button type="button" data-dir="wk-now" style="font-size:13px">${dayStr(wd.ws)} – ${dayStr(wd.ws+6)}${wkOffset===0?'<br>(esta semana)':''}</button><button type="button" data-dir="wk-next" aria-label="Semana siguiente"${wkOffset>=0?' disabled':''}>▸</button></div>`;
- const head=`<div class="dir-sec-title" style="margin-top:0">${ven?'REGISTRO DE VENTAS':'REGISTRO DE FICHAJE'}</div>`;
+ const head=`<div class="dir-sec-title" style="margin-top:0">${ven?'REGISTRO DE VENTAS':comp?'REGISTRO DE COMPRAS':'REGISTRO DE FICHAJE'}</div>`;
  if(wkEmp!==null){
   const e=wd.list.find(x=>x.name===wkEmp)||{name:wkEmp,sales:[],shifts:[]}, has=ven?e.sales.length:e.shifts.length;
   const body=ven?e.sales.map(r=>`<div class="dir-log"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}${r.op==='encargo'?' · ENCARGO':''}${r.fromEncargo?' · ENTREGA':''}<br>Cliente: ${esc(r.client||'—')}<br>${r.items?r.items.map(x=>`${x.qty} × ${esc(x.name)}`).join(', '):summaryText(r.products,r.units)}${r.convenio?'<br>Convenio: '+esc(r.convenio):''}<br>Total: ${money(r.totalCents)} · Cobrado: ${money(collected(r))}</div>`).join(''):
@@ -1634,8 +1635,8 @@ async function reportSend(kind,doc,fname){
 }
 function weeklySalesPayload(){
  const wd=weekData(), list=wd.list.filter(e=>e.sales.length), lab='Semana: '+dayStr(wd.ws)+' – '+dayStr(wd.ws+6);
- if(!list.length)return {empty:true,sum:['MI TIENDA','REGISTRO SEMANAL DE VENTAS',lab,'','Sin ventas esta semana.'].join('\n')};
- const doc=weekDoc(list,'ventas',wd.ws), sum=['MI TIENDA','REGISTRO SEMANAL DE VENTAS',lab,''].concat(list.map(e=>{const t=salesSum(e);return e.name+': '+t.ops+' '+plural(t.ops,'operación','operaciones')+' · cobrado '+money(t.cash)}),['','TOTAL COBRADO: '+money(list.reduce((a,e)=>a+salesSum(e).cash,0)),'(documento completo adjunto)']).join('\n');
+ if(!list.length)return {empty:true,sum:['LA CASA DEL SOBERANO','REGISTRO SEMANAL DE VENTAS',lab,'','Sin ventas esta semana.'].join('\n')};
+ const doc=weekDoc(list,'ventas',wd.ws), sum=['LA CASA DEL SOBERANO','REGISTRO SEMANAL DE VENTAS',lab,''].concat(list.map(e=>{const t=salesSum(e);return e.name+': '+t.ops+' '+plural(t.ops,'operación','operaciones')+' · cobrado '+money(t.cash)}),['','TOTAL COBRADO: '+money(list.reduce((a,e)=>a+salesSum(e).cash,0)),'(documento completo adjunto)']).join('\n');
  return {sum:sum,blob:new Blob(['\ufeff'+doc],{type:'text/plain;charset=utf-8'}),fname:'Semana_'+dayStr(wd.ws).replace(/\//g,'-')+'_Ventas_TODOS.txt'};
 }
 function sendWeekSales(){
@@ -1853,7 +1854,7 @@ async function deleteGasto(id){
 }
 function gastosDoc(){
  const pi=periodInfo('g'), a=accounts(pi.r), line='────────────────────', now=Date.now();
- const o=['MI TIENDA','REGISTRO DE GASTOS · '+pi.kind,'Mi Ciudad · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
+ const o=['LA CASA DEL SOBERANO','REGISTRO DE GASTOS · '+pi.kind,'Saint Denis · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  a.ex.forEach(x=>o.push(`${x.date} ${x.time} · ${CAT_NAMES[x.cat]}`,x.concepto,'Importe: '+money(x.cents),''));
  if(!a.ex.length)o.push('Sin gastos en este periodo.','');
  o.push(line,'Proveedor: '+money(a.byCat.proveedor),'Sueldos: '+money(a.byCat.sueldos),'Otros gastos: '+money(a.byCat.otros),'TOTAL GASTOS: '+money(a.gas),line,'','Tu lema aquí.');
@@ -1874,7 +1875,7 @@ function renderModBalance(){
 }
 function balanceDoc(){
  const pi=periodInfo('b'), a=accounts(pi.r), line='────────────────────', now=Date.now();
- const o=['MI TIENDA','BALANCE DE CUENTAS · '+pi.kind,'Mi Ciudad · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
+ const o=['LA CASA DEL SOBERANO','BALANCE DE CUENTAS · '+pi.kind,'Saint Denis · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  if(pi.sem){
   for(let d=pi.r.s;d<=pi.r.e;d++){const x=accounts({s:d,e:d});o.push(`${DIAS[new Date(d*86400000).getUTCDay()]} ${dayStr(d)} · Ingresos: ${money(x.ing)} · Gastos: ${money(x.gas)} · Beneficio: ${sgn(x.ben)}`)}
   o.push('');
@@ -2068,7 +2069,7 @@ function clientHistHTML(c){
 }
 function renderClientFicha(c){
  const S=(c.series||[]).filter(r=>r.s), line=(k,v,copy)=>`<div class="cf-line"><div><small>${k}</small><b>${v?esc(v):'—'}</b></div>${v&&copy?cpBtn(v):''}</div>`;
- return `<div class="cf-wrap"><div class="cf-paper cf-folder"><div class="cf-head"><small>MI TIENDA · REGISTRO DE CLIENTES</small><div class="cf-name">${esc(c.name)}</div><div class="cf-type">${c.type==='empresa'?'Empresa':'Particular'}</div></div>
+ return `<div class="cf-wrap"><div class="cf-paper cf-folder"><div class="cf-head"><small>LA CASA DEL SOBERANO · REGISTRO DE CLIENTES</small><div class="cf-name">${esc(c.name)}</div><div class="cf-type">${c.type==='empresa'?'Empresa':'Particular'}</div></div>
   <div class="dir-sec-title" style="margin-top:0">FICHA DEL CLIENTE</div>
   ${line('N.º DE IDENTIFICACIÓN',c.ident,1)}${line('TELEGRAMA',c.telegram,1)}
   <div class="dir-sec-title">ARTÍCULOS CON REFERENCIA (${S.length})</div>
@@ -2135,7 +2136,7 @@ function addClientPrice(){
 let ccCount='';
 function cierreDoc(c){
  const line='────────────────────';
- return ['MI TIENDA','CIERRE DE CAJA','Mi Ciudad · 1880','','Día: '+c.date+' · '+c.time,'',line,'Ingresos cobrados: '+money(c.ing),'Gastos: '+money(c.gas),'Esperado en caja: '+sgn(c.exp),'Dinero contado: '+money(c.count),'DIFERENCIA: '+sgn(c.diff)+(c.diff===0?' (cuadra)':c.diff>0?' (sobra)':' (falta)'),line,'','Tu lema aquí.'].join('\n');
+ return ['LA CASA DEL SOBERANO','CIERRE DE CAJA','Saint Denis · 1880','','Día: '+c.date+' · '+c.time,'',line,'Ingresos cobrados: '+money(c.ing),'Gastos: '+money(c.gas),'Esperado en caja: '+sgn(c.exp),'Dinero contado: '+money(c.count),'DIFERENCIA: '+sgn(c.diff)+(c.diff===0?' (cuadra)':c.diff>0?' (sobra)':' (falta)'),line,'','Tu lema aquí.'].join('\n');
 }
 function renderModCierre(){
  const t=todayNum(), a=accounts({s:t,e:t}), exp=a.ing-a.gas, cnt=parseMoney(ccCount), diff=cnt-exp;
@@ -2177,7 +2178,7 @@ function testWebhooks(){
  if(webhook.url)dest[webhook.url]=['canal general'];
  Object.keys(webhook.urls).forEach(k=>{(dest[webhook.urls[k]]=dest[webhook.urls[k]]||[]).push(NAMES[k])});
  const urls=Object.keys(dest); if(!urls.length)return say('Pega primero un enlace de webhook');
- urls.forEach(u=>discordSend('ventas','Prueba de conexión desde Mi Tienda ✔\nAvisos de este canal: '+dest[u].join(', '),null,null,true,u));
+ urls.forEach(u=>discordSend('ventas','Prueba de conexión desde La Casa del Soberano ✔\nAvisos de este canal: '+dest[u].join(', '),null,null,true,u));
 }
 /* --- Resetear datos de operación --- */
 const RESET_OPTS=[['ventas','Ventas (registro de ventas, balance y numeración de tickets)',1],['encargos','Encargos (pendientes y entregados)',1],['gastos','Gastos',1],['pedidos','Pedidos a proveedores (pendientes y completados)',1],['cierres','Cierres de caja',1],['fichajes','Fichajes (registros horarios, fichados ahora y ausencias)',1],['movimientos','Historial de movimientos de stock',1],['stock','Existencias de stock de productos (poner todo a 0)',0],['materiales','Almacén de materiales (poner todo a 0)',0]];
@@ -2347,19 +2348,19 @@ const DC_THUMB={ventas:'moneda-oro.webp',encargos:'vacio-encargos.webp',pedidos:
 function dcThumb(k){try{return DC_THUMB[k]&&/^https?:/.test(location.protocol)?new URL(DC_THUMB[k],location.href).href:''}catch(e){return ''}}
 function dcIcon(){try{return /^https?:/.test(location.protocol)?new URL('emblema.png',location.href).href:''}catch(e){return ''}}
 /* Convierte el texto de siempre en una tarjeta: 1.ª línea = título; «Clave: valor» en negrita */
-const DC_SKIP={'MI TIENDA':1,'Mi Ciudad · 1880':1,'Tu lema aquí.':1};
+const DC_SKIP={'LA CASA DEL SOBERANO':1,'Saint Denis · 1880':1,'Tu lema aquí.':1};
 function dcEmbed(kind,text,img){
  const L=String(text).split('\n').filter(l=>!DC_SKIP[l.trim()]&&!/^─{4,}$/.test(l.trim()));
  while(L.length&&!L[0].trim())L.shift();
- const title=L.shift()||'Mi Tienda';
+ const title=L.shift()||'La Casa del Soberano';
  const desc=L.join('\n').replace(/^\n+/,'').replace(/\n{3,}/g,'\n\n').split('\n').map(l=>{const m=/^(\s*)([^:·$]{2,42}):\s(.+)$/.exec(l);return m?m[1]+'**'+dcEsc(m[2])+':** '+dcEsc(m[3]):dcEsc(l)}).join('\n');
- const e={title:title.slice(0,250),description:(desc.length>3900?desc.slice(0,3890)+'…':desc)||'\u200b',color:KIND_COLOR[kind]||0xC9A24A,footer:{text:'Mi Tienda · Mi Ciudad · 1880'},timestamp:new Date().toISOString()};
+ const e={title:title.slice(0,250),description:(desc.length>3900?desc.slice(0,3890)+'…':desc)||'\u200b',color:KIND_COLOR[kind]||0xC9A24A,footer:{text:'La Casa del Soberano · Saint Denis · 1880'},timestamp:new Date().toISOString()};
  const ic=dcIcon();if(ic)e.footer.icon_url=ic;
  if(img)e.image={url:'attachment://'+img};
  else{const th=dcThumb(kind);if(th)e.thumbnail={url:th}}
  return e;
 }
-function dcPayload(kind,text,img){const p={username:'Mi Tienda',embeds:[dcEmbed(kind,text,img)]},ic=dcIcon();if(ic)p.avatar_url=ic;return p}
+function dcPayload(kind,text,img){const p={username:'La Casa del Soberano',embeds:[dcEmbed(kind,text,img)]},ic=dcIcon();if(ic)p.avatar_url=ic;return p}
 async function discordSend(kind,text,blob,fname,force,urlOverride,isRetry){
  const url=urlOverride||webhook.urls[kind]||webhook.url;
  if(!url||(!force&&!webhook.ev[kind]))return false;
@@ -3408,7 +3409,7 @@ function emitPedido(){
 function pedidosIn(r){return pedidos.filter(x=>{if(!x.completedAt)return false;const m=madridParts(x.completedAt),d=dayNum(+m.year,+m.month,+m.day);return d>=r.s&&d<=r.e})}
 function pedidosDoc(){
  const pi=periodInfo('p'), L=pedidosIn(pi.r), line='────────────────────', now=Date.now();
- const o=['MI TIENDA','REGISTRO DE PEDIDOS A PROVEEDORES · '+pi.kind,'Mi Ciudad · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
+ const o=['LA CASA DEL SOBERANO','REGISTRO DE PEDIDOS A PROVEEDORES · '+pi.kind,'Saint Denis · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  L.forEach(r=>{
   o.push(`${r.code} · ${r.proveedor}${r.proveedorTipo?' ('+r.proveedorTipo+')':''}`,'Completado: '+fmtDate(r.completedAt)+' '+fmtTime(r.completedAt));
   r.items.forEach(x=>o.push(`  ${x.qty} × ${x.material} · ${money(x.price)} = ${money(x.qty*x.price)}`));
@@ -3583,7 +3584,7 @@ async function empDelete(id){
  empleados=empleados.filter(x=>x.id!==id);saveEmp();renderDir();renderCustomer();say('Empleado eliminado');
 }
 function contractText(e){
- return ['CONTRATO DE TRABAJO · MI TIENDA','Empleado: '+e.name,'Puesto: '+e.puesto,'Sueldo semanal: '+money(e.sueldo),'Horas semanales: '+(e.horas||10),'Inicio del contrato: '+fmtISO(e.inicio),e.sinPrueba?'Periodo de prueba: no (contrato por ascenso)':'Periodo de prueba: 1 semana (del '+fmtISO(e.inicio)+' al '+fmtISO(e.prueba||isoAdd(e.inicio,6))+')'].join('\n');
+ return ['CONTRATO DE TRABAJO · LA CASA DEL SOBERANO','Empleado: '+e.name,'Puesto: '+e.puesto,'Sueldo semanal: '+money(e.sueldo),'Horas semanales: '+(e.horas||10),'Inicio del contrato: '+fmtISO(e.inicio),e.sinPrueba?'Periodo de prueba: no (contrato por ascenso)':'Periodo de prueba: 1 semana (del '+fmtISO(e.inicio)+' al '+fmtISO(e.prueba||isoAdd(e.inicio,6))+')'].join('\n');
 }
 async function sendContract(e,asc){
  if(!(webhook.urls.empleados||webhook.url)||!webhook.ev.empleados)return;
@@ -3610,12 +3611,12 @@ async function contractBlob(e){
   const wrap=(t,font,col,lh)=>{g.font=font;g.fillStyle=col;g.textAlign='left';const words=String(t).split(' ');let line='';words.forEach(w=>{const tt=line?line+' '+w:w;if(g.measureText(tt).width>W-2*P&&line){g.fillText(line,P,y);y+=lh;line=w}else line=tt});if(line){g.fillText(line,P,y);y+=lh}};
   const hr=(lw)=>{g.strokeStyle=sep;g.lineWidth=lw||1.5;g.beginPath();g.moveTo(P,y);g.lineTo(W-P,y);g.stroke()};
   if(emb){const eh=86,ew=emb.width*eh/emb.height;g.drawImage(emb,(W-ew)/2,y,ew,eh);y+=eh+34}else y+=16;
-  ctr('MI TIENDA','bold 32px '+fb,'#1b3022',30);
-  ctr('Mi Ciudad · 1880','17px '+ff,'#6b4c1d',24);
+  ctr('LA CASA DEL SOBERANO','bold 32px '+fb,'#1b3022',30);
+  ctr('Saint Denis · 1880','17px '+ff,'#6b4c1d',24);
   ctr('◆ ─── ✦ ─── ◆','16px '+ff,sep,40);
   ctr('CONTRATO DE TRABAJO','bold 26px '+fb,ink,34);
   hr(2);y+=34;
-  wrap('Por el presente documento, la casa Mi Tienda, tienda establecida en Mi Ciudad, incorpora a su servicio a:','19px '+ff,ink,27);
+  wrap('Por el presente documento, La Casa del Soberano, establecida en Saint Denis, incorpora a su servicio a:','19px '+ff,ink,27);
   y+=18;ctr(e.name,'bold 34px '+ff,'#1b3022',22);
   g.strokeStyle=sep;g.lineWidth=1;g.beginPath();g.moveTo(W/2-170,y);g.lineTo(W/2+170,y);g.stroke();y+=42;
   const kv=(k,v)=>{g.textAlign='left';g.font='14px '+fb;g.fillStyle='#6b4c1d';g.fillText(k,P,y);g.textAlign='right';g.font='bold 21px '+ff;g.fillStyle=ink;g.fillText(v,W-P,y);y+=12;g.strokeStyle='rgba(122,90,34,.35)';g.lineWidth=1;g.beginPath();g.moveTo(P,y);g.lineTo(W-P,y);g.stroke();y+=30};
@@ -3630,10 +3631,10 @@ async function contractBlob(e){
   {const up=e.sinPrueba&&e.ascensos&&e.ascensos[e.ascensos.length-1];wrap(up?'Contrato por ascenso de '+up.de+' a '+up.a+'. Sustituye al anterior y rige desde el '+dayStr(up.desde)+'.':'Durante el periodo de prueba, cualquiera de las partes podrá dar por terminada esta relación sin más aviso.','italic 18px '+ff,'#4a3417',26)}
   y+=18;
   const f=new Intl.DateTimeFormat('es-ES',{timeZone:'Europe/Madrid',day:'numeric',month:'long',year:'numeric'}).format(e.alta||Date.now());
-  ctr('En Mi Ciudad, a '+f+'.','18px '+ff,ink,64);
+  ctr('En Saint Denis, a '+f+'.','18px '+ff,ink,64);
   const sx=[P+130,W-P-130];
   g.strokeStyle=ink;g.lineWidth=1.2;sx.forEach(x=>{g.beginPath();g.moveTo(x-120,y);g.lineTo(x+120,y);g.stroke()});
-  g.textAlign='center';g.font='italic 24px '+ff;g.fillStyle='#24324a';g.fillText(e.name,sx[0],y-10);g.fillText('Mi Tienda',sx[1],y-10);
+  g.textAlign='center';g.font='italic 24px '+ff;g.fillStyle='#24324a';g.fillText(e.name,sx[0],y-10);g.fillText('La Casa del Soberano',sx[1],y-10);
   y+=24;g.font='14px '+fb;g.fillStyle='#6b4c1d';g.fillText('EL EMPLEADO',sx[0],y);g.fillText('POR LA DIRECCIÓN',sx[1],y);
   y+=70;
   const cx=W/2,cy=y,rg=g.createRadialGradient(cx-10,cy-10,5,cx,cy,42);rg.addColorStop(0,'#c0402a');rg.addColorStop(.65,'#7a1608');rg.addColorStop(1,'#4d0d05');
@@ -4017,8 +4018,8 @@ async function ticketBlob(s){
   let y=P+16;
   const ctr=(t,font,col,dy)=>{g.font=font;g.fillStyle=col;g.textAlign='center';g.fillText(t,W/2,y);y+=dy};
   if(emb){const h=90,w=emb.width*h/emb.height;g.drawImage(emb,(W-w)/2,y,w,h);y+=h+36}else y+=14;
-  ctr('MI TIENDA','bold 30px '+fb,'#1b3022',34);
-  ctr('Mi Ciudad · 1880','17px '+ff,'#6b4c1d',26);
+  ctr('LA CASA DEL SOBERANO','bold 30px '+fb,'#1b3022',34);
+  ctr('Saint Denis · 1880','17px '+ff,'#6b4c1d',26);
   ctr('Tu lema aquí.','italic 19px '+ff,ink,34);
   ctr(s.op==='encargo'?'REGISTRO DE ENCARGO':'REGISTRO DE VENTA','bold 15px '+fb,ink,30);
   const kv=(k,v)=>{g.textAlign='left';g.font='13px '+ff;g.fillStyle='#6b4c1d';g.fillText(k.toUpperCase(),P,y);y+=19;g.font='bold 20px '+ff;g.fillStyle=ink;let t=String(v);while(g.measureText(t).width>W-2*P&&t.length>4)t=t.slice(0,-2);g.fillText(t===String(v)?t:t+'…',P,y);y+=27};
@@ -4061,8 +4062,8 @@ async function pedidoBlob(r){
   const ctr=(t,font,col,dy)=>{g.font=font;g.fillStyle=col;g.textAlign='center';g.fillText(t,W/2,y);y+=dy};
   const kv=(k,v)=>{g.textAlign='left';g.font='13px '+ff;g.fillStyle='#6b4c1d';g.fillText(k.toUpperCase(),P,y);y+=20;g.font='bold 20px '+ff;g.fillStyle=ink;g.fillText(String(v),P,y);y+=28};
   const hr=w=>{g.strokeStyle=sep;g.lineWidth=w||2;g.beginPath();g.moveTo(P,y);g.lineTo(W-P,y);g.stroke();y+=26};
-  ctr('MI TIENDA','bold 28px '+fb,'#1b3022',30);
-  ctr('Mi Ciudad · 1880','16px '+ff,'#6b4c1d',30);
+  ctr('LA CASA DEL SOBERANO','bold 28px '+fb,'#1b3022',30);
+  ctr('Saint Denis · 1880','16px '+ff,'#6b4c1d',30);
   ctr('ALBARÁN DE PEDIDO','bold 18px '+fb,ink,32);
   kv('Pedido N.º',r.code+' · '+r.date+' '+r.time);kv('Proveedor',r.proveedor+(r.proveedorTipo?' · '+r.proveedorTipo:''));if(r.proveedorTel)kv('Telegrama',r.proveedorTel);
   y+=4;hr();
@@ -4102,12 +4103,12 @@ applyFs();
 /* Pantalla de bienvenida: solo una vez por sesión */
 
 /* Instalar como app (icono en la pantalla de inicio) */
-try{const m={name:'Mi Tienda · Mi Ciudad',short_name:'Mi Tienda',start_url:location.href.split('#')[0],display:'standalone',background_color:'#07140f',theme_color:'#07140f',icons:[{src:new URL('emblema.png',location.href).href,sizes:'512x512',type:'image/png'}]};
+try{const m={name:'La Casa del Soberano',short_name:'La Casa del Soberano',start_url:location.href.split('#')[0],display:'standalone',background_color:'#07140f',theme_color:'#07140f',icons:[{src:new URL('emblema.png',location.href).href,sizes:'512x512',type:'image/png'}]};
  const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'}));document.head.appendChild(l)}catch(e){}
 const TUTORIAL=[
 ['Entrada y usuario',`<p>Al abrir la web aparece la <b>fachada de la tienda</b>. Pulsa <b>ENTRAR</b>: suena la campanilla, se abre la puerta y pasas dentro.</p>
 <ul><li>Toca <b>tu tarjeta</b> en «¿Quién entra hoy?» (las estrellas y galones indican el puesto; el sello rojo, que es jefe). La tarjeta se acerca y te pide <b>tu contraseña</b>; al acertarla se da la vuelta y te saluda.</li><li><b>La primera vez</b> que entras, la tarjeta te pide que <b>crees tu contraseña</b> (dos veces, mínimo 4 caracteres). A partir de ahí, solo tú puedes entrar con tu tarjeta. Si la olvidas, pídele a la dirección que te la resetee y la próxima vez crearás una nueva. Si fallas 5 veces seguidas, la tarjeta se bloquea un minuto.</li><li>Los jefes entran con la contraseña de jefe, que es compartida. La web te saluda por tu nombre con un resumen: tus horas de esta semana, si es día de pago, los encargos pendientes y quién está ausente.</li><li><b>Tu foto</b>: toca <b>tu nombre</b> arriba para abrir tu ficha y pulsa <b>📷 SUBIR MI FOTO</b> (por ejemplo, una captura de tu personaje). Saldrá en tu tarjeta de la entrada en tono sepia. Puedes cambiarla o quitarla cuando quieras.</li><li>La entrada dura unos 4 segundos. Si tienes prisa, toca la pantalla y pasas directamente a las tarjetas.</li><li><b>Tu usuario queda fijo</b> hasta que cierres la pestaña o la web. Sale arriba, junto a Dirección. Todo lo que hagas va a tu nombre: ventas, fichajes, ausencias y pedidos recibidos. No se puede cambiar de usuario sin cerrar y volver a abrir. Si recargas la página, sigues siendo tú.</li><li><b>Jefes</b>: las fichas con el puesto «Jefe» piden la <b>contraseña de jefe</b> (la misma para todos los jefes) cada vez que se entra. Con ella, el modo jefe y DIRECCIÓN quedan activados hasta que cierres la web; no se cierran por inactividad.</li><li>Si la dirección te <b>expulsa</b> (por ejemplo, si se te queda la sesión pillada), vuelves a la entrada con un aviso y tienes que elegir tu ficha otra vez. Si estabas fichado, se te ficha la salida en ese momento.</li><li><b>👁</b> junto a las contraseñas sirve para ver lo que escribes.</li><li><b>Cerrar sesión</b>: al fichar tu salida, la web te pregunta si quieres cerrar tu sesión en ese dispositivo.</li></ul>`],
-['Primeros pasos',`<p>Esta web es la calculadora de ventas, presupuestos y encargos de <b>Mi Tienda</b>. Funciona igual en móvil y en ordenador.</p>
+['Primeros pasos',`<p>Esta web es la calculadora de ventas, presupuestos y encargos de <b>La Casa del Soberano</b>. Funciona igual en móvil y en ordenador.</p>
 <ul><li><b>FICHAJE</b> (barra de arriba): ▸ Fichar entrada y ◂ Fichar salida.</li><li><b>ENCARGOS</b>: los encargos guardados que aún no se han entregado.</li><li><b>Tu nombre</b> (arriba): el usuario con el que has entrado. Si eres jefe, sale «· JEFE» y el botón <b>DIRECCIÓN</b>.</li><li>La placa <b>DÍA DE PAGO</b> (dorada) sale desde el domingo hasta que se pagan todos los sueldos; luego cambia a <b>SUELDOS PAGADOS</b> (verde) hasta el jueves. Cada uno ve en ella su propio sueldo.</li><li><b>PEDIDOS</b>: los pedidos a proveedores pendientes. La pestaña <b>MATERIALES</b> (junto a Venta y Presupuesto) muestra el almacén de materiales.</li><li><b>⚙</b> abre los ajustes: <b>música de fondo</b> (un piano de saloon, activado de serie; empieza a sonar en cuanto tocas la pantalla y se apaga aquí), <b>ambiente</b> (AUTO cambia solo entre día y noche según la hora española; también puedes dejar ☀ DÍA o ☾ NOCHE fijo), sonido y vibración, tamaño del texto (A− / A+) y alto contraste (◐). Cada móvil recuerda sus ajustes.</li><li>La placa dorada <b>EMPLEADO DE LA SEMANA</b> muestra quién más cobró la semana anterior.</li><li>En el tutorial, <b>▶ VISITA GUIADA</b> hace un recorrido rápido señalando cada botón.</li><li>Junto a FICHAJE ves cada empleado fichado con el tiempo que lleva, y el estado de la nube: «☁ guardando…» mientras se guarda algo y «☁ guardado ✓» cuando ya está.</li><li>Los avisos de error salen en <b>rojo</b> y duran más en pantalla; los normales, en verde.</li><li><b>? TUTORIAL</b> (esquina superior derecha) abre esta guía cuando la necesites.</li><li>El botón <b>↑</b> aparece al bajar mucho y te devuelve arriba.</li></ul>
 <p>Si recargas la página o se cierra el navegador, <b>la venta que tenías en curso se conserva</b>. Se borra solo con Vaciar o Nueva venta, y siempre pidiendo confirmación.</p>
 <p>Para tenerla como una app: en el menú del navegador, <b>Añadir a pantalla de inicio</b>.</p>`],
@@ -4446,7 +4447,7 @@ function dayText(){
 function sendDaySummary(){if(shifts.length)return;discordSend('resumen',dayText())}
 function shiftText(r){
  const same=fmtDate(r.start)===fmtDate(r.end), line='────────────────────';
- const out=['MI TIENDA','REGISTRO DE FICHAJE','Mi Ciudad · 1880','','Empleado: '+r.name];
+ const out=['LA CASA DEL SOBERANO','REGISTRO DE FICHAJE','Saint Denis · 1880','','Empleado: '+r.name];
  if(same)out.push('Fecha: '+fmtDate(r.start),'Entrada: '+fmtTime(r.start),'Salida: '+fmtTime(r.end));
  else out.push('Entrada: '+fmtStamp(r.start),'Salida: '+fmtStamp(r.end));
  out.push('Tiempo: '+fmtDuration(r.start,r.end),'',line,'Tu lema aquí.');
@@ -4660,7 +4661,7 @@ function invChanged(items,why){
 }
 function invSchedule(kind){clearTimeout(invTimers[kind]);invTimers[kind]=setTimeout(()=>invPublish(kind),1200)}
 function stockText(){
- const L=['STOCK DE PRODUCTOS · MI TIENDA','Actualizado: '+fmtDate(Date.now())+' '+fmtTime(Date.now())];
+ const L=['STOCK DE PRODUCTOS · LA CASA DEL SOBERANO','Actualizado: '+fmtDate(Date.now())+' '+fmtTime(Date.now())];
  if(invLast.stock)L.push('Último movimiento: '+invLast.stock);
  const low=lowStock();
  CATS.forEach(([c,label])=>{const its=inputs.filter(i=>i.closest('.product').dataset.cat===c);if(!its.length)return;L.push('',label.toUpperCase());its.forEach(i=>{const n=i.dataset.name;L.push('  '+n+' · '+(stockMap[n]||0)+(low.indexOf(n)>=0?' ⚠':''))})});
@@ -4668,7 +4669,7 @@ function stockText(){
  return L.join('\n');
 }
 function matText(){
- const L=['ALMACÉN DE MATERIALES · MI TIENDA','Actualizado: '+fmtDate(Date.now())+' '+fmtTime(Date.now())];
+ const L=['ALMACÉN DE MATERIALES · LA CASA DEL SOBERANO','Actualizado: '+fmtDate(Date.now())+' '+fmtTime(Date.now())];
  if(invLast.materiales)L.push('Último movimiento: '+invLast.materiales);
  const ns=matNames();L.push('');
  if(!ns.length)L.push('Sin materiales todavía.');
@@ -5052,7 +5053,7 @@ function gateOpen(opt){
  G.msgOk=!!(opt&&opt.msg&&/^Sesión cerrada/.test(opt.msg));
  opt=opt||{};G.open=true;gClear();G.pending=null;G.msg=opt.msg||'';G.big=null;
  document.body.classList.add('gate-open');gate.hidden=false;
- const st=document.getElementById('gSignTxt');st.innerHTML=[...'MI TIENDA'].map((ch,i)=>`<i style="animation-delay:${(0.9+i*0.07+(i%3)*0.05).toFixed(2)}s">${ch===' '?'&nbsp;':ch}</i>`).join('');
+ const st=document.getElementById('gSignTxt');st.innerHTML=[...'LA CASA DEL SOBERANO'].map((ch,i)=>`<i style="animation-delay:${(0.9+i*0.07+(i%3)*0.05).toFixed(2)}s">${ch===' '?'&nbsp;':ch}</i>`).join('');
  const full=!opt.quick&&!gReduced();
  G.full=full;gFx(true);loadPhotos();
  if(full){gPh('scene');gUi.innerHTML='<button type="button" class="g-enter" id="gEnter">ENTRAR</button><div class="g-hint">Mi Tienda · Mi Ciudad</div>';gBoltLoop(3500)}
@@ -5102,7 +5103,7 @@ const G_KEY='<svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-1.5 7.7L9 21h6l-1
 const G_CN='<svg viewBox="0 0 24 24"><path d="M2 22V9Q2 2 9 2h13"/><path d="M5.5 22V11q0-5.5 5.5-5.5H22"/><path d="M9 14q1.5-5 7-5"/><circle cx="9" cy="9" r="1.4"/></svg>';
 function cardInner(e,abs){
  const ini=(e.name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(), ph=PHOTOS[e.id]||(e.id==='prueba'?'ayudante-pruebas.webp':null);
- return `${isJefe(e)?`<span class="gc-wax" title="Pide la contraseña de jefe">${G_KEY}</span>`:''}<i class="gc-cn tl">${G_CN}</i><i class="gc-cn tr">${G_CN}</i><i class="gc-cn bl">${G_CN}</i><i class="gc-cn br">${G_CN}</i><span class="gc-oval${ph?' has-photo':''}">${ph?`<img class="gc-photo" src="${ph}" alt="">`:''}<span class="gc-mono">${esc(ini)}</span></span><span class="gc-name" style="--nl:${Math.max(8,(e.name||'').length)}">${esc(e.name)}</span><span class="gc-role" style="--rl:${Math.max(8,(e.puesto||'Empleado').length)}">${esc(e.puesto||'Empleado')}</span><span class="gc-rank">${G_RANK[e.puesto]||''}</span><span class="gc-studio">Mi Ciudad, 1880</span>${abs?'<span class="gc-stamp">AUSENTE</span>':''}${e.id==='prueba'?'<span class="gc-stamp prueba">PRUEBA</span>':''}`;
+ return `${isJefe(e)?`<span class="gc-wax" title="Pide la contraseña de jefe">${G_KEY}</span>`:''}<i class="gc-cn tl">${G_CN}</i><i class="gc-cn tr">${G_CN}</i><i class="gc-cn bl">${G_CN}</i><i class="gc-cn br">${G_CN}</i><span class="gc-oval${ph?' has-photo':''}">${ph?`<img class="gc-photo" src="${ph}" alt="">`:''}<span class="gc-mono">${esc(ini)}</span></span><span class="gc-name" style="--nl:${Math.max(8,(e.name||'').length)}">${esc(e.name)}</span><span class="gc-role" style="--rl:${Math.max(8,(e.puesto||'Empleado').length)}">${esc(e.puesto||'Empleado')}</span><span class="gc-rank">${G_RANK[e.puesto]||''}</span><span class="gc-studio">Saint Denis, 1880</span>${abs?'<span class="gc-stamp">AUSENTE</span>':''}${e.id==='prueba'?'<span class="gc-stamp prueba">PRUEBA</span>':''}`;
 }
 function gateCards(){
  gClear();G.big=null;{const ob=document.getElementById('gBig');if(ob)ob.remove()}
