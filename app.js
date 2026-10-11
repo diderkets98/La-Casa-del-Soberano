@@ -1378,7 +1378,7 @@ const DIRECCION_MODULOS=[
  {id:'horarios',titulo:'REGISTROS HORARIOS',desc:'Consultar los fichajes de los empleados.',render:()=>renderModHorarios()},
  {id:'ausencias',titulo:'AUSENCIAS',desc:'Quién está ausente, hasta cuándo y por qué.',render:()=>renderModAusencias()},
  {id:'ventas',titulo:'REGISTROS DE VENTAS',desc:'Consultar y anular operaciones.',render:()=>renderModVentas()},
- {id:'compras',titulo:'REGISTROS DE COMPRAS',desc:'Consultar las compras realizadas a clientes.',render:()=>renderModCompras()},
+ {id:'compras',titulo:'REGISTROS DE COMPRAS',desc:'Inventario de objetos comprados para revender.',render:()=>renderModCompras()},
  {id:'semanales',titulo:'REGISTROS SEMANALES',desc:'Resumen semanal de ventas y fichajes de cada empleado.',render:()=>renderModSemanales()},
  {id:'gastos',titulo:'GASTOS',desc:'Registrar gastos y descargar el registro.',render:()=>renderModGastos()},
  {id:'sueldos',titulo:'SUELDOS',desc:'Pago de los domingos según las horas echadas.',render:()=>renderModSueldos()},
@@ -1438,60 +1438,216 @@ function renderModHorarios(){
  const open=shifts.length?`<div class="dir-sec-title" style="margin-top:0">TURNOS ABIERTOS (${shifts.length})</div>`+shifts.map(x=>{const lg=Date.now()-x.start>MAX_SHIFT_H*3600000, def=fmtTime(Math.min(Date.now(),x.start+4*3600000));return `<div class="enc-card dir-item${lg?' shift-long':''}"><div class="t">${esc(x.name)}</div><div class="it">Entrada: ${fmtDate(x.start)} ${fmtTime(x.start)} · lleva ${fmtDuration(x.start,Date.now())}${lg?' · <b class="neg">¿se le olvidó fichar la salida?</b>':''}</div><div class="shift-fix"><label>Hora real de salida<input type="time" data-shfix="${esc(x.empId)}" value="${def}"></label><button type="button" class="warn" data-dir="sh-fix:${esc(x.empId)}">CERRAR TURNO</button></div></div>`}).join(''):'';
  return open+`<div class="dir-sec-title"${shifts.length?'':' style="margin-top:0"'}>HISTORIAL DE FICHAJES (${a.length})</div>${searchBox('⌕  Buscar por empleado o fecha…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm(r.name+' '+fmtDate(r.start)))}"><b>${esc(r.name)}</b><br>${fmtDate(r.start)} ${fmtTime(r.start)} → ${fmtDate(r.end)} ${fmtTime(r.end)} · ${fmtDuration(r.start,r.end)}</div>`).join(''):'<div class="enc-empty">Todavía no hay fichajes registrados.<br>Se guardan a partir de ahora al fichar la salida.</div>')+'</div>';
 }
-/* ═══════════════════════════════════════════════════
-   MÓDULO DE COMPRAS
-   ═══════════════════════════════════════════════════ */
-function logBuy(buy){
-  const a=loadLog(KEY_BUYLOG);
-  const e={
-    id:buy.id, date:buy.date, time:buy.time,
-    items:buy.items, totalCents:buy.totalCents,
-    vendedor:buy.vendedor||'—', employee:buy.employee||'—',
-    note:buy.note||'', products:buy.products, units:buy.units
-  };
-  a.push(e);
-  store.set(KEY_BUYLOG,JSON.stringify(a.slice(-5000)));
-  cloudPut('compra:'+e.id,e);
+
+/* ═══════════════════════════════════════════════════════════════
+   INVENTARIO DE COMPRAS — objetos comprados para revender
+   ═══════════════════════════════════════════════════════════════ */
+const KEY_INVENTORY = 'tienda_inventory_v1';
+
+function loadInventory(){
+  try{ return JSON.parse(store.get(KEY_INVENTORY)||'[]'); }catch(e){ return []; }
+}
+function saveInventory(a){
+  store.set(KEY_INVENTORY, JSON.stringify(a));
+  cloudPut('inventory', a);
 }
 
+/* Asigna categoría automáticamente según el nombre */
+function guessCat(nombre){
+  const n = nombre.toLowerCase();
+  if(/collar|pendiente|anillo|pulsera|gargantilla|aro|solitario|joya|diamante|esmeralda|rubí|rubi|perla|oro|plata|joyero|broche|diadema/.test(n)) return 'joyas';
+  if(/ilegal|droga|veneno|contrabando|falsificad|prohibid/.test(n)) return 'ilegales';
+  if(/npc|tienda oficial|catalogo|catálogo/.test(n)) return 'npc';
+  if(/tabaco|cigarro|whisky|alcohol|comida|bebida|víveres|viveres|carne|pan|ron|cerveza|cachimba/.test(n)) return 'miscelanea';
+  if(/material|hierro|madera|tela|cuero|metal|mineral|plomo|cobre|acero|carbon|carbón|grasa|aceite|pólvora|polvora/.test(n)) return 'materiales';
+  return 'articulos'; // por defecto: artículos varios
+}
+
+/* Siguiente ID de inventario */
+function nextInvId(){
+  const a = loadInventory();
+  const nums = a.map(x=>parseInt((x.id||'').replace('INV-',''))||0);
+  return 'INV-' + String((Math.max(0,...nums)+1)).padStart(4,'0');
+}
+
+/* Guardar nuevo objeto comprado */
+function saveInventoryItem(item){
+  const a = loadInventory();
+  a.push(item);
+  saveInventory(a);
+}
+
+/* Actualizar objeto existente */
+function updateInventoryItem(id, changes){
+  const a = loadInventory();
+  const idx = a.findIndex(x=>x.id===id);
+  if(idx>=0){ Object.assign(a[idx], changes); saveInventory(a); }
+}
+
+/* Obtener objetos disponibles (qty > 0) para el catálogo de ventas */
+function inventoryAvailable(){
+  return loadInventory().filter(x=>x.qty>0);
+}
+
+/* Reducir cantidad al vender */
+function inventorySell(id, qty){
+  const a = loadInventory();
+  const item = a.find(x=>x.id===id);
+  if(item){ item.qty = Math.max(0, (item.qty||1) - (qty||1)); saveInventory(a); }
+}
+
+/* Render del módulo REGISTROS DE COMPRAS en Dirección */
 function renderModCompras(){
-  const a=loadLog(KEY_BUYLOG).slice().reverse().slice(0,200);
-  return `<div class="dir-sec-title" style="margin-top:0">COMPRAS REGISTRADAS (${a.length})</div>${searchBox("⌕  Buscar por vendedor, empleado o número…")}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm([r.id,r.vendedor,r.employee,r.date].join(" ")))}"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}<br>Vendedor: ${esc(r.vendedor||"-")}<br>Empleado: ${esc(r.employee||"-")}<br>${summaryText(r.products,r.units)}${r.note?"<br>Nota: "+esc(r.note):""}<br>Total pagado: ${money(r.totalCents)}</div>`).join(""):"<div class=\"enc-empty\">Todavía no hay compras registradas.</div>")+"</div>";
+  const a = loadInventory().slice().reverse();
+  const disponibles = a.filter(x=>x.qty>0).length;
+  const vendidos = a.filter(x=>x.qty===0).length;
+  return `
+<div class="dir-sec-title" style="margin-top:0">INVENTARIO DE COMPRAS (${a.length})</div>
+<div class="enc-card dir-item" style="margin-bottom:12px">
+  <div class="t">RESUMEN</div>
+  <div class="it">${disponibles} disponibles para venta · ${vendidos} vendidos (historial)</div>
+</div>
+${searchBox('⌕  Buscar por nombre, vendedor o categoría…')}
+<div class="ledger">
+${a.length ? a.map(r=>`
+<div class="dir-log inv-row ${r.qty>0?'inv-disp':'inv-sold'}" data-q="${esc(norm([r.nombre,r.vendedor,r.cat,r.id].join(' ')))}">
+  <div class="inv-main">
+    <b>${esc(r.nombre)}</b>
+    <span class="inv-cat-badge">${esc(catNombre(r.cat))}</span>
+    ${r.qty>0?'<span class="inv-badge-disp">DISPONIBLE</span>':'<span class="inv-badge-sold">VENDIDO</span>'}
+  </div>
+  <div class="inv-detail">
+    Vendedor: <b>${esc(r.vendedor||'—')}</b> · Precio compra: <b>${money(r.costoC)}</b>
+    ${r.precioV?'· Precio venta est.: <b>'+money(r.precioV)+'</b>':''} · 
+    ${r.costoC&&r.precioV?'Beneficio est.: <b class="'+(r.precioV-r.costoC>=0?'positiva':'negativa')+'">'+money(r.precioV-r.costoC)+'</b>':''}
+  </div>
+  ${r.nota?`<div class="inv-nota">Nota: ${esc(r.nota)}</div>`:''}
+  <div class="inv-actions">
+    <button type="button" class="enc-btn-sm" data-dir="inv-edit:${esc(r.id)}">✏ Editar</button>
+    ${r.qty===0?`<button type="button" class="enc-btn-sm" data-dir="inv-restock:${esc(r.id)}">↩ Reponer</button>`:''}
+  </div>
+</div>`).join('') : '<div class="enc-empty">Todavía no hay objetos comprados.<br>Usa el modo COMPRA para añadirlos.</div>'}
+</div>`;
 }
 
-function finishBuyAction(){
-  const items=selected();
-  if(!items.length){say('Añade algún producto primero');return;}
-  const now=new Date();
-  const mp=madridParts(now.getTime());
-  const id=`MC-${mp.day}${mp.month}${mp.year.slice(-2)}-${pad(nextBuyNumber(),3)}`;
-  const vendedor=(document.getElementById('vendedorName')||{}).value||'';
-  const employee=(document.getElementById('empSelC')||{}).value||'';
-  const note=(document.getElementById('buyNote')||{}).value||'';
-  if(!vendedor.trim()){say('Indica el nombre del vendedor');document.getElementById('vendedorName').focus();return;}
-  if(!employee){say('Elige el empleado que registra la compra');return;}
-  const total=items.reduce((a,x)=>a+x.qty*x.cents,0);
-  const units=items.reduce((a,x)=>a+x.qty,0);
-  const buy={
-    id:id, date:`${mp.day}/${mp.month}/${mp.year}`,
-    time:`${mp.hour}:${mp.minute}`,
-    items:items.map(x=>({name:x.name,qty:x.qty,cents:x.cents})),
-    totalCents:total, units:units, products:items.length,
-    vendedor:vendedor.trim(), employee:employee, note:note.trim()
+function catNombre(id){
+  const map={npc:'Objetos NPC',ilegales:'Obj. Ilegales',joyas:'Joyas',articulos:'Artículos varios',miscelanea:'Miscelánea',materiales:'Materiales'};
+  return map[id]||id||'—';
+}
+
+/* Modal de formulario de compra */
+function renderBuyForm(editId){
+  const inv = loadInventory();
+  const item = editId ? inv.find(x=>x.id===editId) : null;
+  const cats = [
+    ['joyas','💎 Joyas'],['articulos','📦 Artículos varios'],['miscelanea','🍶 Miscelánea'],
+    ['npc','🏦 Objetos NPC'],['ilegales','⚠️ Obj. Ilegales'],['materiales','🪵 Materiales']
+  ];
+  return `
+<div class="buy-form-modal" id="buyFormModal">
+  <div class="buy-form-box">
+    <div class="buy-form-title">${item?'EDITAR OBJETO':'REGISTRAR COMPRA'}</div>
+    <label class="fld wide"><span>Nombre del objeto *</span>
+      <input id="bfNombre" type="text" maxlength="60" placeholder="Ej.: Collar de diamantes" value="${item?esc(item.nombre):''}" autocomplete="off">
+    </label>
+    <label class="fld wide"><span>Vendedor (quién te lo vende) *</span>
+      <input id="bfVendedor" type="text" maxlength="60" placeholder="Nombre del vendedor" value="${item?esc(item.vendedor):''}" autocomplete="off">
+    </label>
+    <label class="fld wide"><span>Precio de compra *</span>
+      <input id="bfCosto" type="text" inputmode="decimal" placeholder="0.00" value="${item?fmtNum(item.costoC/100):''}">
+    </label>
+    <label class="fld wide"><span>Precio de venta estimado (opcional)</span>
+      <input id="bfPrecioV" type="text" inputmode="decimal" placeholder="0.00" value="${item&&item.precioV?fmtNum(item.precioV/100):''}">
+    </label>
+    <label class="fld wide"><span>Categoría</span>
+      <select id="bfCat">
+        ${cats.map(([id,n])=>`<option value="${id}"${(item?item.cat:guessCat(''))===id?' selected':''}>${n}</option>`).join('')}
+      </select>
+    </label>
+    <label class="fld wide"><span>Nota (opcional)</span>
+      <input id="bfNota" type="text" maxlength="120" placeholder="Ej.: comprado en Rhodes" value="${item?esc(item.nota||''):''}">
+    </label>
+    ${item?`<input type="hidden" id="bfEditId" value="${esc(editId)}">`:'' }
+    <div class="buy-form-ganancia" id="bfGanancia"></div>
+    <div class="buy-form-actions">
+      <button type="button" class="primary" id="bfGuardar">${item?'GUARDAR CAMBIOS':'REGISTRAR COMPRA'}</button>
+      <button type="button" id="bfCancelar">Cancelar</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function fmtNum(n){ return n>0 ? n.toFixed(2) : ''; }
+
+function openBuyForm(editId){
+  // Quitar modal anterior si existe
+  const old = document.getElementById('buyFormModal');
+  if(old) old.remove();
+  document.body.insertAdjacentHTML('beforeend', renderBuyForm(editId));
+  const modal = document.getElementById('buyFormModal');
+
+  // Auto-categoría al escribir nombre
+  const inpNombre = document.getElementById('bfNombre');
+  const selCat = document.getElementById('bfCat');
+  if(!editId){
+    inpNombre.addEventListener('input', ()=>{
+      const cat = guessCat(inpNombre.value);
+      selCat.value = cat;
+    });
+  }
+
+  // Cálculo ganancia en tiempo real
+  function calcGan(){
+    const c = parseFloat(document.getElementById('bfCosto').value.replace(',','.'))||0;
+    const v = parseFloat(document.getElementById('bfPrecioV').value.replace(',','.'))||0;
+    const el = document.getElementById('bfGanancia');
+    if(c>0&&v>0){ const g=v-c; el.innerHTML=`Beneficio estimado: <b class="${g>=0?'positiva':'negativa'}">${g>=0?'+':''} $${Math.abs(g).toFixed(2)}</b>`; }
+    else el.innerHTML='';
+  }
+  document.getElementById('bfCosto').addEventListener('input', calcGan);
+  document.getElementById('bfPrecioV').addEventListener('input', calcGan);
+
+  // Guardar
+  document.getElementById('bfGuardar').onclick = ()=>{
+    const nombre = document.getElementById('bfNombre').value.trim();
+    const vendedor = document.getElementById('bfVendedor').value.trim();
+    const costoStr = document.getElementById('bfCosto').value.replace(',','.');
+    const precioVStr = document.getElementById('bfPrecioV').value.replace(',','.');
+    const cat = document.getElementById('bfCat').value;
+    const nota = document.getElementById('bfNota').value.trim();
+    const costoC = Math.round(parseFloat(costoStr)*100)||0;
+    const precioV = Math.round(parseFloat(precioVStr)*100)||0;
+
+    if(!nombre){ say('Escribe el nombre del objeto'); document.getElementById('bfNombre').focus(); return; }
+    if(!vendedor){ say('Escribe el nombre del vendedor'); document.getElementById('bfVendedor').focus(); return; }
+    if(!costoC){ say('Escribe el precio de compra'); document.getElementById('bfCosto').focus(); return; }
+
+    const editIdVal = (document.getElementById('bfEditId')||{}).value;
+    if(editIdVal){
+      updateInventoryItem(editIdVal, {nombre, vendedor, costoC, precioV, cat, nota});
+      say('Objeto actualizado');
+    } else {
+      const now = new Date(); const mp = madridParts(now.getTime());
+      saveInventoryItem({
+        id: nextInvId(), nombre, vendedor, costoC, precioV, cat, nota,
+        qty: 1, date: `${mp.day}/${mp.month}/${mp.year}`, time: `${mp.hour}:${mp.minute}`
+      });
+      say('Compra registrada: ' + nombre);
+      buzz(60);
+    }
+    modal.remove();
+    // Si estamos en dirección/compras, refrescar
+    if(dirMod==='compras') renderDir();
   };
-  logBuy(buy);
-  clearAll();
-  say('Compra registrada: '+id);
-  buzz(60);
+
+  // Cancelar
+  document.getElementById('bfCancelar').onclick = ()=> modal.remove();
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+
+  // Focus
+  setTimeout(()=>inpNombre.focus(), 50);
 }
 
-let buyCounter=0;
-function nextBuyNumber(){
-  try{buyCounter=parseInt(store.get('tienda_buy_counter_v1')||'0')||0;}catch(e){}
-  buyCounter++;
-  try{store.set('tienda_buy_counter_v1',String(buyCounter));}catch(e){}
-  return buyCounter;
-}
 
 function weekBuyData(ws){
   return loadLog(KEY_BUYLOG).filter(r=>{
@@ -3792,6 +3948,9 @@ dirModal.addEventListener('click',e=>{
  else if(act==='price-save')savePrices();
  else if(act==='cp-add')addCustomProduct();
  else if(act==='cp-del')delCustomProduct(decodeURIComponent(arg));
+ else if(act==='inv-edit'){openBuyForm(arg);}
+ else if(act==='inv-new'){openBuyForm();}
+ else if(act==='inv-restock'){updateInventoryItem(arg,{qty:1});say('Objeto repuesto');renderDir();}
  else if(act==='cl-new'){clEdit='new';clView=null;clWork={name:'',type:'particular',telegram:'',ident:'',precios:{},series:[]};renderDir()}
  else if(act==='cl-edit'){const c=clientes.find(x=>x.id===arg);if(c){clEdit=arg;clWork=JSON.parse(JSON.stringify(c));renderDir()}}
  else if(act==='cl-cancel'){clEdit=null;renderDir()}
@@ -4291,7 +4450,7 @@ function setMode(m){
 }
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
 const finishBuyBtn=document.getElementById('finishBuy');
-if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();finishBuyAction();};
+const finishBuyBtn2=document.getElementById('finishBuy');if(finishBuyBtn2)finishBuyBtn2.onclick=()=>{playClick();openBuyForm();};
 const newBuyBtn=document.getElementById('newBuy');
 if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();say('Nueva compra');};
 document.getElementById('toSale').onclick=async()=>{
