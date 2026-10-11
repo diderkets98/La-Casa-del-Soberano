@@ -2300,7 +2300,8 @@ const MOD_ICONS={
  regpedidos:'<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8.5 9h7M8.5 13h7M8.5 17h4M9 4V3h6v1"/>',
  nube:'<path d="M7 18h10a4 4 0 000-8 6 6 0 00-11.5-1A4.5 4.5 0 007 18z"/>',
  copia:'<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>',
- balance:'<path d="M12 4v16M7 20h10M5 8h14"/><path d="M5 8l-3 6c0 1.7 6 1.7 6 0zM19 8l-3 6c0 1.7 6 1.7 6 0z"/>'
+ balance:'<path d="M12 4v16M7 20h10M5 8h14"/><path d="M5 8l-3 6c0 1.7 6 1.7 6 0zM19 8l-3 6c0 1.7 6 1.7 6 0z"/>',
+ compras:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/>'
 };
 function avisosHTML(){
  const A=[], hoy=todayISO();
