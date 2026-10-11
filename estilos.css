@@ -1643,6 +1643,9 @@ body.modo-cliente .p-venta-lbl{color:#5a9a64}
 .p-venta{border-color:#1a3a22;color:#4a8a54}
 body.modo-npc .p-venta{color:#3a6a42;pointer-events:none;opacity:.7}
 body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:auto;opacity:1}
+/* Mostrar/ocultar filas según modo */
+body.modo-npc .p-venta-row{display:none}
+body.modo-cliente .p-npc-row{display:none}
 /* Input cantidad */
 .p-col-qty-val{display:flex;align-items:center;justify-content:center}
 .p-col-qty-val input{width:56px;background:#030806;border:1px solid #2a3a1e;border-left:0;border-right:0;color:#fff;font-size:20px;font-weight:bold;text-align:center;font-family:inherit;height:40px;border-radius:0}
