@@ -1646,6 +1646,16 @@ body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:aut
 /* Mostrar/ocultar filas según modo */
 body.modo-npc .p-venta-row{display:none}
 body.modo-cliente .p-npc-row{display:none}
+
+/* ══ MODO COMPRA ══ */
+body:not(.mode-compra) .only-compra{display:none!important}
+body.mode-compra .only-venta{display:none!important}
+body.mode-compra .only-pres{display:none!important}
+body.mode-compra #peristaBar{display:none!important}
+body.mode-compra .p-precio-lbl:first-child{color:#c8a84a}
+body.mode-compra .mode-tab[data-mode="compra"]{background:#1a2818;color:#e8d48a;border-color:#7a5a22}
+body.mode-compra #grand{color:#e05a5a}
+body.mode-compra #totalLabel{color:#e05a5a}
 /* Input cantidad */
 .p-col-qty-val{display:flex;align-items:center;justify-content:center}
 .p-col-qty-val input{width:56px;background:#030806;border:1px solid #2a3a1e;border-left:0;border-right:0;color:#fff;font-size:20px;font-weight:bold;text-align:center;font-family:inherit;height:40px;border-radius:0}
