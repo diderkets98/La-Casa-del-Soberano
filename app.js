@@ -484,7 +484,7 @@ function recordFx(t,sub){
  const el=document.createElement('div');el.className='record-fx';el.innerHTML=`<div><b>${esc(t)}</b><span>${esc(sub)}</span></div>`;
  document.body.appendChild(el);setTimeout(()=>el.remove(),3600);playBells();
 }
-/* Al vender objetos a un cliente con nombre, se pueden apuntar sus números de referencia (opcional) */
+/* Al vender armas a un cliente con nombre, se pueden apuntar sus números de serie (opcional) */
 let serSale=null;
 const serModal=document.getElementById('serModal');
 function weaponUnits(s){const W=weaponNames(),L=[];(s.items||[]).forEach(x=>{if(W.indexOf(x.name)>=0)for(let i=0;i<Math.min(x.qty,20);i++)L.push(x.name)});return L}
@@ -493,7 +493,7 @@ function askSerials(s){
  const L=weaponUnits(s); if(!L.length)return;
  s.serialsAsked=true;try{store.set(KEY_SALE,JSON.stringify(s))}catch(e){}
  serSale={id:s.id,client:s.client,units:L};
- document.getElementById('serBody').innerHTML=`<p class="bk-note">Opcional: apunta el número de referencia de cada artículo vendido a <b>${esc(s.client)}</b>. Se guardan en su ficha de cliente (y en su mensaje de Discord).</p>`+
+ document.getElementById('serBody').innerHTML=`<p class="bk-note">Opcional: apunta el número de serie de cada arma vendida a <b>${esc(s.client)}</b>. Se guardan en su ficha de cliente (y en su mensaje de Discord).</p>`+
   L.map((n,i)=>`<label class="ser-l">${esc(n)}<input data-sv="${i}" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="N.º de serie (opcional)"></label>`).join('')+
   '<div class="enc-actions two" style="margin-top:10px"><button type="button" id="serSkip">Ahora no</button><button type="button" class="primary" id="serSave">GUARDAR EN SU FICHA</button></div>';
  setTimeout(()=>{openModal(serModal);serModal.scrollTop=0},700);
@@ -821,6 +821,10 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
   var btnNPC=document.getElementById('peristaDestNPC');
   var btnCliente=document.getElementById('peristaDestCliente');
   window._peristaMode='npc';
+ // Ocultar perista-bar en modo compra
+ document.body.addEventListener('classchange',()=>{});
+ const peristaBar=document.getElementById('peristaBar');
+ function updatePeristaBar(){if(peristaBar)peristaBar.hidden=appMode==='compra';}
 
   function parseMny(v){return parseFloat(String(v||'').replace(',','.'))||0}
   function fmt(n){return(n<0?'−':'')+' $'+Math.abs(n).toFixed(2)}
@@ -1253,7 +1257,7 @@ fxApply();
 })();
 
 /* ===== Registros (historial de fichajes y ventas para Dirección) ===== */
-const KEY_SHIFTLOG='tienda_shiftlog_v1', KEY_SALELOG='tienda_salelog_v1';
+const KEY_SHIFTLOG='tienda_shiftlog_v1', KEY_SALELOG='tienda_salelog_v1', KEY_BUYLOG='tienda_buylog_v1';
 function loadLog(k){try{const a=JSON.parse(store.get(k)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
 function logShift(r){const a=loadLog(KEY_SHIFTLOG), rec={uid:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:r.name,start:r.start,end:r.end};a.push(rec);store.set(KEY_SHIFTLOG,JSON.stringify(a.slice(-5000)));cloudPut('turno:'+rec.uid,rec)}
 function logSale(sl){
@@ -1373,6 +1377,7 @@ const DIRECCION_MODULOS=[
  {id:'horarios',titulo:'REGISTROS HORARIOS',desc:'Consultar los fichajes de los empleados.',render:()=>renderModHorarios()},
  {id:'ausencias',titulo:'AUSENCIAS',desc:'Quién está ausente, hasta cuándo y por qué.',render:()=>renderModAusencias()},
  {id:'ventas',titulo:'REGISTROS DE VENTAS',desc:'Consultar y anular operaciones.',render:()=>renderModVentas()},
+ {id:'compras',titulo:'REGISTROS DE COMPRAS',desc:'Consultar las compras realizadas a clientes.',render:()=>renderModCompras()},
  {id:'semanales',titulo:'REGISTROS SEMANALES',desc:'Resumen semanal de ventas y fichajes de cada empleado.',render:()=>renderModSemanales()},
  {id:'gastos',titulo:'GASTOS',desc:'Registrar gastos y descargar el registro.',render:()=>renderModGastos()},
  {id:'sueldos',titulo:'SUELDOS',desc:'Pago de los domingos según las horas echadas.',render:()=>renderModSueldos()},
@@ -1432,6 +1437,69 @@ function renderModHorarios(){
  const open=shifts.length?`<div class="dir-sec-title" style="margin-top:0">TURNOS ABIERTOS (${shifts.length})</div>`+shifts.map(x=>{const lg=Date.now()-x.start>MAX_SHIFT_H*3600000, def=fmtTime(Math.min(Date.now(),x.start+4*3600000));return `<div class="enc-card dir-item${lg?' shift-long':''}"><div class="t">${esc(x.name)}</div><div class="it">Entrada: ${fmtDate(x.start)} ${fmtTime(x.start)} · lleva ${fmtDuration(x.start,Date.now())}${lg?' · <b class="neg">¿se le olvidó fichar la salida?</b>':''}</div><div class="shift-fix"><label>Hora real de salida<input type="time" data-shfix="${esc(x.empId)}" value="${def}"></label><button type="button" class="warn" data-dir="sh-fix:${esc(x.empId)}">CERRAR TURNO</button></div></div>`}).join(''):'';
  return open+`<div class="dir-sec-title"${shifts.length?'':' style="margin-top:0"'}>HISTORIAL DE FICHAJES (${a.length})</div>${searchBox('⌕  Buscar por empleado o fecha…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm(r.name+' '+fmtDate(r.start)))}"><b>${esc(r.name)}</b><br>${fmtDate(r.start)} ${fmtTime(r.start)} → ${fmtDate(r.end)} ${fmtTime(r.end)} · ${fmtDuration(r.start,r.end)}</div>`).join(''):'<div class="enc-empty">Todavía no hay fichajes registrados.<br>Se guardan a partir de ahora al fichar la salida.</div>')+'</div>';
 }
+/* ═══════════════════════════════════════════════════
+   MÓDULO DE COMPRAS
+   ═══════════════════════════════════════════════════ */
+function logBuy(buy){
+  const a=loadLog(KEY_BUYLOG);
+  const e={
+    id:buy.id, date:buy.date, time:buy.time,
+    items:buy.items, totalCents:buy.totalCents,
+    vendedor:buy.vendedor||'—', employee:buy.employee||'—',
+    note:buy.note||'', products:buy.products, units:buy.units
+  };
+  a.push(e);
+  store.set(KEY_BUYLOG,JSON.stringify(a.slice(-5000)));
+  cloudPut('compra:'+e.id,e);
+}
+
+function renderModCompras(){
+  const a=loadLog(KEY_BUYLOG).slice().reverse().slice(0,200);
+  return `<div class="dir-sec-title" style="margin-top:0">COMPRAS REGISTRADAS (${a.length})</div>${searchBox('⌕  Buscar por vendedor, empleado o número…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log" data-q="${esc(norm([r.id,r.vendedor,r.employee,r.date].join(' '))))}"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}<br>Vendedor: ${esc(r.vendedor||'—')}<br>Empleado: ${esc(r.employee||'—')}<br>${summaryText(r.products,r.units)}${r.note?'<br>Nota: '+esc(r.note):''}<br>Total pagado: ${money(r.totalCents)}</div>`).join(''):'<div class="enc-empty">Todavía no hay compras registradas.<br>Se guardan al finalizar cada compra.</div>')+'</div>';
+}
+
+function finishBuyAction(){
+  const items=selected();
+  if(!items.length){say('Añade algún producto primero');return;}
+  const now=new Date();
+  const mp=madridParts(now.getTime());
+  const id=`MC-${mp.day}${mp.month}${mp.year.slice(-2)}-${pad(nextBuyNumber(),3)}`;
+  const vendedor=(document.getElementById('vendedorName')||{}).value||'';
+  const employee=(document.getElementById('empSelC')||{}).value||'';
+  const note=(document.getElementById('buyNote')||{}).value||'';
+  if(!vendedor.trim()){say('Indica el nombre del vendedor');document.getElementById('vendedorName').focus();return;}
+  if(!employee){say('Elige el empleado que registra la compra');return;}
+  const total=items.reduce((a,x)=>a+x.qty*x.cents,0);
+  const units=items.reduce((a,x)=>a+x.qty,0);
+  const buy={
+    id:id, date:`${mp.day}/${mp.month}/${mp.year}`,
+    time:`${mp.hour}:${mp.minute}`,
+    items:items.map(x=>({name:x.name,qty:x.qty,cents:x.cents})),
+    totalCents:total, units:units, products:items.length,
+    vendedor:vendedor.trim(), employee:employee, note:note.trim()
+  };
+  logBuy(buy);
+  clearAll();
+  say('Compra registrada: '+id);
+  buzz(60);
+}
+
+let buyCounter=0;
+function nextBuyNumber(){
+  try{buyCounter=parseInt(store.get('tienda_buy_counter_v1')||'0')||0;}catch(e){}
+  buyCounter++;
+  try{store.set('tienda_buy_counter_v1',String(buyCounter));}catch(e){}
+  return buyCounter;
+}
+
+function weekBuyData(ws){
+  return loadLog(KEY_BUYLOG).filter(r=>{
+    const t=String(r.date).split('/').map(Number);
+    const d=dayNum(t[2],t[1],t[0]);
+    return d>=ws&&d<=ws+6;
+  });
+}
+
 function renderModVentas(){
  const a=loadLog(KEY_SALELOG).slice().reverse().slice(0,200);
  return `<div class="dir-sec-title" style="margin-top:0">VENTAS REGISTRADAS (${a.length})</div>${searchBox('⌕  Buscar por cliente, empleado o número…')}<div class="ledger">`+(a.length?a.map(r=>`<div class="dir-log${r.voided?' voided':''}" data-q="${esc(norm([r.id,r.client,r.employee,r.date].join(' ')))}"><b>${esc(r.id)}</b> · ${esc(r.date)} ${esc(r.time)}${r.op==='encargo'?' · ENCARGO':''}${r.voided?'<span class="void-tag">ANULADA</span>':''}<br>Cliente: ${esc(r.client||'—')}<br>Empleado: ${esc(r.employee||'—')}<br>${summaryText(r.products,r.units)}${r.convenio?' · '+esc(r.convenio):''}${r.note?'<br>Nota: '+esc(r.note):''}<br>Total: ${money(r.totalCents)}${r.dueCents!==r.totalCents?' · A cobrar: '+money(r.dueCents):''}${r.voided?'':`<div class="emp-btns"><button type="button" class="warn" data-dir="void:${esc(r.id)}">ANULAR</button></div>`}</div>`).join(''):'<div class="enc-empty">Todavía no hay ventas registradas.<br>Se guardan a partir de ahora al finalizar cada venta.</div>')+'</div>';
@@ -1509,7 +1577,7 @@ function downloadWeek(name){
  say('Documento descargado');
 }
 function renderModSemanales(){
- if(!wkType)return '<button type="button" class="enc-card" data-dir="wk-type:ventas"><div class="t">REGISTRO DE VENTAS</div><div class="it">Ventas semanales de cada empleado.</div></button><button type="button" class="enc-card" data-dir="wk-type:fichajes"><div class="t">REGISTRO DE FICHAJE</div><div class="it">Horas fichadas cada semana por empleado.</div></button>';
+ if(!wkType)return '<button type="button" class="enc-card" data-dir="wk-type:ventas"><div class="t">REGISTRO DE VENTAS</div><div class="it">Ventas semanales de cada empleado.</div></button><button type="button" class="enc-card" data-dir="wk-type:compras"><div class="t">REGISTRO DE COMPRAS</div><div class="it">Compras semanales registradas.</div></button><button type="button" class="enc-card" data-dir="wk-type:fichajes"><div class="t">REGISTRO DE FICHAJE</div><div class="it">Horas fichadas cada semana por empleado.</div></button>';
  const wd=weekData(), ven=wkType==='ventas';
  const nav=`<div style="display:grid;grid-template-columns:48px 1fr 48px;gap:8px;margin-bottom:10px" class="enc-actions"><button type="button" data-dir="wk-prev" aria-label="Semana anterior">◂</button><button type="button" data-dir="wk-now" style="font-size:13px">${dayStr(wd.ws)} – ${dayStr(wd.ws+6)}${wkOffset===0?'<br>(esta semana)':''}</button><button type="button" data-dir="wk-next" aria-label="Semana siguiente"${wkOffset>=0?' disabled':''}>▸</button></div>`;
  const head=`<div class="dir-sec-title" style="margin-top:0">${ven?'REGISTRO DE VENTAS':'REGISTRO DE FICHAJE'}</div>`;
@@ -1544,10 +1612,12 @@ function periodInfo(k){const r=periodRange(k), sem=per[k].mode==='sem';return {r
 /* Ingresos = dinero cobrado en ventas (mismo criterio que los registros semanales); beneficio = ingresos − gastos */
 function accounts(r){
  const sales=loadLog(KEY_SALELOG).filter(x=>{if(x.voided)return false;const d=saleDay(x);return d>=r.s&&d<=r.e});
+ const buys=weekBuyData(r.s).filter(x=>{const d=saleDay(x);return d>=r.s&&d<=r.e});
  const ex=gastos.filter(x=>x.day>=r.s&&x.day<=r.e), byCat={proveedor:0,sueldos:0,otros:0};
  ex.forEach(x=>{byCat[x.cat]+=x.cents});
  const ing=sales.reduce((a,x)=>a+collected(x),0), gas=ex.reduce((a,x)=>a+x.cents,0);
- return {sales:sales,ex:ex,ing:ing,gas:gas,ben:ing-gas,byCat:byCat,ops:sales.length};
+ const comprado=buys.reduce((a,x)=>a+x.totalCents,0);
+ return {sales:sales,buys:buys,ex:ex,ing:ing,gas:gas,ben:ing-gas-comprado,comprado:comprado,byCat:byCat,ops:sales.length};
 }
 function periodBar(k){
  const pi=periodInfo(k), p=per[k];
@@ -1918,7 +1988,7 @@ function renderModProductos(){
   return `<div class="price-row"><span class="nm">${esc(n)}${cust?'<span class="cust-tag">NUEVO</span>':''}${ch?'<span class="cust-tag">EDITADO</span>':''}</span><div style="display:flex;gap:6px;align-items:center"><div class="money"><i>$</i><input data-pe="${esc(n)}" inputmode="decimal" value="${esc(v)}" aria-label="Precio de ${esc(n)}"></div>${cust?`<div class="emp-btns"><button type="button" class="warn" data-dir="cp-del:${encodeURIComponent(n)}" aria-label="Eliminar">🗑</button></div>`:''}</div></div>`;
  }).join('')).join('');
  const form=`<div class="dir-form enc-sec"><div class="dir-sec-title" style="margin-top:0">AÑADIR PRODUCTO NUEVO</div>
-  <label>NOMBRE<input id="cpName" type="text" maxlength="40" autocomplete="off" value="${esc(cpDraft.name)}" placeholder="Ej.: Collar de diamantes"></label>
+  <label>NOMBRE<input id="cpName" type="text" maxlength="40" autocomplete="off" value="${esc(cpDraft.name)}" placeholder="Ej.: Rifle Lancaster"></label>
   <label>CATEGORÍA<select id="cpCat"><option value="">Seleccionar…</option>${CATS.map(([c,l])=>`<option value="${c}"${cpDraft.cat===c?' selected':''}>${l}</option>`).join('')}</select></label>
   <label>PRECIO ($)<div class="money"><i>$</i><input id="cpPrice" inputmode="decimal" placeholder="0.00" value="${esc(cpDraft.price)}"></div></label>
   <label>DESCRIPCIÓN CORTA (OPCIONAL)<input id="cpDesc" type="text" maxlength="160" autocomplete="off" value="${esc(cpDraft.desc)}" placeholder="Para la ficha del producto"></label>
@@ -1959,14 +2029,14 @@ let clEdit=null, clWork=null, clQ='';
 const MAX_SERIES=20;
 function weaponNames(){return inputs.filter(i=>{const c=tCat(i.closest('.product').dataset.cat);return !!(c&&c.serie)}).map(i=>i.dataset.name)}
 function serieRows(c){const L=(c.series||[]).filter(r=>r&&(r.s||r.a)).map(r=>({s:r.s||'',a:r.a||''}));if(L.length<MAX_SERIES)L.push({s:'',a:''});c.series=L;return L}
-function serieRowHTML(r,i){return `<div class="serie-row"><input data-ser="s" data-i="${i}" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="N.º de ref. ${i+1}" value="${esc(r.s)}"><select data-ser="a" data-i="${i}" aria-label="Artículo"><option value="">Artículo (opcional)</option>${weaponNames().map(n=>`<option value="${esc(n)}"${r.a===n?' selected':''}>${esc(n)}</option>`).join('')}${r.a&&weaponNames().indexOf(r.a)<0?`<option value="${esc(r.a)}" selected>${esc(r.a)}</option>`:''}</select></div>`}
+function serieRowHTML(r,i){return `<div class="serie-row"><input data-ser="s" data-i="${i}" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="N.º de serie ${i+1}" value="${esc(r.s)}"><select data-ser="a" data-i="${i}" aria-label="Arma"><option value="">Arma (opcional)</option>${weaponNames().map(n=>`<option value="${esc(n)}"${r.a===n?' selected':''}>${esc(n)}</option>`).join('')}${r.a&&weaponNames().indexOf(r.a)<0?`<option value="${esc(r.a)}" selected>${esc(r.a)}</option>`:''}</select></div>`}
 function clientText(c,title){
  const L=[title||'FICHA DE CLIENTE','Nombre: '+c.name,'Tipo: '+(c.type==='empresa'?'Empresa':'Particular'),'Telegrama: '+(c.telegram||'—')];
  if(c.ident)L.push('N.º de identificación: '+c.ident);
  const pk=Object.keys(c.precios||{});
  if(pk.length){L.push('','Precios especiales:');pk.forEach(n=>L.push('  '+n+' · '+money(Math.round(c.precios[n]*100))))}
  const S=(c.series||[]).filter(r=>r.s);
- L.push('','Artículos con referencia: '+S.length);
+ L.push('','Armas vendidas (n.º de serie): '+S.length);
  S.forEach((r,i)=>L.push('  '+(i+1)+'. '+r.s+(r.a?' · '+r.a:'')));
  L.push('','Actualizado: '+fmtDate(Date.now())+' '+fmtTime(Date.now()));
  return L.join('\n');
@@ -2001,7 +2071,7 @@ function renderClientFicha(c){
  return `<div class="cf-wrap"><div class="cf-paper cf-folder"><div class="cf-head"><small>MI TIENDA · REGISTRO DE CLIENTES</small><div class="cf-name">${esc(c.name)}</div><div class="cf-type">${c.type==='empresa'?'Empresa':'Particular'}</div></div>
   <div class="dir-sec-title" style="margin-top:0">FICHA DEL CLIENTE</div>
   ${line('N.º DE IDENTIFICACIÓN',c.ident,1)}${line('TELEGRAMA',c.telegram,1)}
-  <div class="dir-sec-title">ARTÍCULOS CON REFERENCIA (${S.length})</div>
+  <div class="dir-sec-title">ARMAS VENDIDAS (${S.length})</div>
   ${S.length?S.map((r,i)=>`<div class="cf-arma"><div class="cf-n">${i+1}</div><div class="cf-col">${line('N.º DE SERIE',r.s,1)}${line('ARMA',r.a,1)}</div></div>`).join(''):'<div class="enc-empty">Sin armas registradas.</div>'}
   ${clientHistHTML(c)}
   ${Object.keys(c.precios||{}).length?`<div class="dir-sec-title">PRECIOS ESPECIALES</div>`+Object.keys(c.precios).map(n=>`<div class="reg-line"><span>${esc(n)}</span><b>${money(Math.round(c.precios[n]*100))}</b></div>`).join(''):''}
@@ -2016,8 +2086,8 @@ function renderModClientes(){
    <label>TIPO<select id="clType"><option value="particular"${c.type==='particular'?' selected':''}>PARTICULAR</option><option value="empresa"${c.type==='empresa'?' selected':''}>EMPRESA</option></select></label>
    <label>N.º DE IDENTIFICACIÓN (OPCIONAL)<input id="clIdent" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="Ej.: 4821-SD" value="${esc(c.ident||'')}"></label>
    <label>TELEGRAMA<input id="clTel" type="text" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ej.: JS-458" value="${esc(c.telegram||'')}"></label>
-   <div class="dir-sec-title">ARTÍCULOS · NÚMEROS DE REFERENCIA (<span id="serCount">${serieRows(c).filter(r=>r.s).length}</span>/${MAX_SERIES})</div>
-   <p class="bk-note" style="margin:0 0 8px">No es obligatorio. Al escribir una referencia aparece otro hueco, hasta ${MAX_SERIES}. Al lado puedes indicar qué artículo es.</p>
+   <div class="dir-sec-title">ARMAS VENDIDAS · NÚMEROS DE SERIE (<span id="serCount">${serieRows(c).filter(r=>r.s).length}</span>/${MAX_SERIES})</div>
+   <p class="bk-note" style="margin:0 0 8px">No es obligatorio. Al escribir un número aparece otro hueco, hasta ${MAX_SERIES}. Al lado puedes indicar qué arma es.</p>
    <div id="serList">${serieRows(c).map((r,i)=>serieRowHTML(r,i)).join('')}</div>
    <div class="dir-sec-title">PRECIOS ESPECIALES (${pk.length})</div>
    ${pk.map(n=>`<div class="price-row"><span class="nm">${esc(n)}</span><div style="display:flex;gap:6px;align-items:center"><b>${money(Math.round(c.precios[n]*100))}</b><div class="emp-btns"><button type="button" class="warn" data-dir="cl-pdel:${encodeURIComponent(n)}">✕</button></div></div></div>`).join('')||'<div class="enc-empty">Sin precios especiales: paga los precios normales.</div>'}
@@ -2037,8 +2107,8 @@ function saveClient(){
  if(clientes.some(x=>x.id!==clEdit&&norm(x.name)===norm(name)))return err('Ya existe un cliente con ese nombre');
  if(!clWork.telegram)return err('Escribe el telegrama del cliente');
  const S=(clWork.series||[]).map(r=>({s:String(r.s||'').trim(),a:r.a||''}));
- const bad=S.find(r=>!r.s&&r.a); if(bad)return err('Falta el número de referencia de «'+bad.a+'»');
- const seen={};for(const r of S.filter(r=>r.s)){if(seen[r.s])return err('El número de referencia '+r.s+' está repetido');seen[r.s]=1}
+ const bad=S.find(r=>!r.s&&r.a); if(bad)return err('Falta el número de serie de «'+bad.a+'»');
+ const seen={};for(const r of S.filter(r=>r.s)){if(seen[r.s])return err('El número de serie '+r.s+' está repetido');seen[r.s]=1}
  clWork.name=name;clWork.ident=String(clWork.ident||'').trim();clWork.series=S.filter(r=>r.s).slice(0,MAX_SERIES);
  let id=clEdit;
  if(clEdit==='new'){id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);clientes.push(Object.assign({id:id},clWork))}
@@ -2669,7 +2739,7 @@ function pzTitle(s){s=String(s).replace(/\s+/g,' ').trim();if(s.length>3&&s===s.
 function pzTelegram(st){return sanitizeTelegram(pzTake(st,'telegrama|telegram|telégrafo|telegrafo|tlg|tg|tel|buzón|buzon|apartado','tok'))}
 function pzIdent(st){return pzTake(st,'n\\.?[º°o]?\\.? de identificaci[oó]n|n[uú]mero de identificaci[oó]n|identificaci[oó]n|identidad|documento|dni|pasaporte|c[eé]dula|id','tok')}
 const PZ_GREET=/^(hola|buenas|buenos d[ií]as|buenas tardes|buenas noches|saludos|estimad[oa]s?|querid[oa]s?|se[ñn]or(es)?|hey|ey|gracias|un saludo|atentamente|firmado)\b[\s,.!:]*$/i;
-const PZ_JUNK=/^(hola|buenas|saludos|gracias|un saludo|atentamente|lista de precios|precios?|productos?|materiales|artículos?|ficha|datos|cliente|proveedor|nuevo cliente|nuevo proveedor)\b/i;
+const PZ_JUNK=/^(hola|buenas|saludos|gracias|un saludo|atentamente|lista de precios|precios?|productos?|materiales|armas?|ficha|datos|cliente|proveedor|nuevo cliente|nuevo proveedor)\b/i;
 function pzSegs(t,yy){
  const out=[];
  t.split('\n').forEach(l=>{
@@ -2777,9 +2847,9 @@ let pzOpen='', pzText='', pzMsg=null, pzHit=[];
 function pzBox(k){
  const msg=pzMsg&&pzMsg.k===k?`<div class="pz-msg${pzMsg.bad?' bad':''}" role="status">${pzMsg.t}</div>`:'';
  if(pzOpen!==k)return msg+`<div class="pz-row enc-actions"><button type="button" class="pz-btn" data-dir="pz-open:${k}">📋 PEGAR MENSAJE</button><small>Opcional: pega el mensaje ${k==='cl'?'del cliente':'del proveedor'} tal cual te llega y la ficha se rellena sola.</small></div>`;
- const ph=k==='cl'?'Ej.: Pascual Martínez, telegrama 4521, identificación 88231. Artículos: Collar de diamantes ref. 55123, Anillo de bodas ref. 77810':'Ej.: Mina Rock Roy, de Annesburg. Telegrama MRR-21. Lista de precios: oro 5$, hierro 1,20$, carbón 0,80$, sal 0,50$, azufre 2$';
+ const ph=k==='cl'?'Ej.: Pascual Martínez, telegrama 4521, identificación 88231. Armas: Lemat n.º 55123, Schofield n.º 77810':'Ej.: Mina Rock Roy, de Annesburg. Telegrama MRR-21. Lista de precios: oro 5$, hierro 1,20$, carbón 0,80$, sal 0,50$, azufre 2$';
  return msg+`<div class="pz-panel"><label for="pzText">PEGA AQUÍ EL MENSAJE</label><textarea id="pzText" rows="6" spellcheck="false" placeholder="${esc(ph)}">${esc(pzText)}</textarea>
-  <p class="bk-note">${k==='cl'?'Reconoce el nombre, el telegrama, el número de identificación y los números de referencia con su artículo.':'Reconoce el nombre de la empresa, el telegrama, el tipo de negocio, la ubicación y cada producto con su precio.'} Después revisas la ficha y la guardas tú.</p>
+  <p class="bk-note">${k==='cl'?'Reconoce el nombre, el telegrama, el número de identificación y los números de serie con su arma.':'Reconoce el nombre de la empresa, el telegrama, el tipo de negocio, la ubicación y cada producto con su precio.'} Después revisas la ficha y la guardas tú.</p>
   <div class="enc-actions two"><button type="button" data-dir="pz-close">Cancelar</button><button type="button" class="primary" data-dir="pz-go:${k}">RELLENAR LA FICHA</button></div></div>`;
 }
 function pzList(a){return a.length>1?a.slice(0,-1).join(', ')+' y '+a[a.length-1]:a[0]||''}
@@ -2908,7 +2978,7 @@ document.addEventListener('keydown',e=>{
  if(e.ctrlKey||typing||anyModal)return;
  if(e.key==='/'){const q=document.getElementById('search');if(q){e.preventDefault();q.focus();q.select()}}
  else if(e.key==='?'){e.preventDefault();openTutorial()}
- else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('#catNav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
+ else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('.cat-nav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
 });
 /* ===== Libro de turno: notas para el siguiente turno ===== */
 const KEY_NOTAS='tienda_notas_v1', libroModal=document.getElementById('libroModal'), libroBtn=document.getElementById('libroBtn');
@@ -2962,7 +3032,7 @@ function renderLibro(){
  title.textContent='LIBRO DE TURNO';
  const O=openNotas().slice().reverse(), D=notas.filter(n=>n.done).slice(-15).reverse();
  body.innerHTML=`<p class="bk-note" style="margin:0 0 8px">Deja aquí lo que tiene que saber el siguiente turno. Las notas salen a todos al fichar la entrada hasta que alguien pulsa <b>HECHO / VISTO</b>.</p>
-  <div class="dir-form enc-sec lb-new"><label for="lbText">NUEVA NOTA</label><textarea id="lbText" maxlength="400" placeholder="Ej.: Queda poco stock de collar de diamantes. Mañana viene el cliente a recoger su encargo.">${esc(libroDraft)}</textarea>
+  <div class="dir-form enc-sec lb-new"><label for="lbText">NUEVA NOTA</label><textarea id="lbText" maxlength="400" placeholder="Ej.: Queda poca munición de rifle. Mañana viene Dutch a recoger su encargo.">${esc(libroDraft)}</textarea>
   <div class="enc-actions" style="margin-top:8px"><button type="button" class="primary" data-lb="add">DEJAR NOTA</button></div></div>
   <div class="dir-sec-title">PENDIENTES (${O.length})</div>${O.length?O.map(notaHTML).join(''):'<div class="enc-empty">No hay notas pendientes.</div>'}
   ${D.length?`<details class="mat-mins" style="margin-top:12px"><summary>HECHAS ÚLTIMAMENTE (${D.length})</summary>${D.map(notaHTML).join('')}</details>`:''}`;
@@ -3140,7 +3210,7 @@ function audConfig(name,oS,nS){
   Object.keys(A).forEach(k=>{if(!B[k]&&k!=='prueba')audit('Personal','Quitó de la plantilla a '+A[k].name)});return}
  if(name==='clientes'){const A=byId(o),B=byId(n);Object.keys(B).forEach(k=>{const a=A[k],b=B[k];if(!a)return audit('Clientes','Cliente nuevo: '+b.name);const d=[];
    if(a.name!==b.name)d.push('nombre ('+a.name+')');if(a.telegram!==b.telegram)d.push('telegrama '+(a.telegram||'—')+' → '+(b.telegram||'—'));if((a.ident||'')!==(b.ident||''))d.push('identificación');if(a.type!==b.type)d.push('tipo');
-   const sa=(a.series||[]).length,sb=(b.series||[]).length;if(sa!==sb)d.push((sb>sa?'+':'')+(sb-sa)+' artículos');else if(ch(a.series,b.series))d.push('números de referencia');
+   const sa=(a.series||[]).length,sb=(b.series||[]).length;if(sa!==sb)d.push((sb>sa?'+':'')+(sb-sa)+' armas');else if(ch(a.series,b.series))d.push('números de serie');
    Object.keys(Object.assign({},a.precios,b.precios)).forEach(p=>{if(ch((a.precios||{})[p],(b.precios||{})[p]))d.push('precio especial de '+p+': '+((a.precios||{})[p]!=null?$d(a.precios[p]):'—')+' → '+((b.precios||{})[p]!=null?$d(b.precios[p]):'—'))});
    if(d.length)audit('Clientes','Ficha de '+b.name+': '+d.join(', '))});
   Object.keys(A).forEach(k=>{if(!B[k])audit('Clientes','Eliminó el cliente '+A[k].name)});return}
@@ -3404,7 +3474,7 @@ function renderModFabricacion(){
    <label>QUIERO FABRICAR (UNIDADES)<input id="fabWant" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="Ej.: 10" value="${esc(fabWant)}"></label>
    <div id="fabNeed">${fabNeedHTML()}</div></div>`:''}`;
  }
- const cats=[...document.querySelectorAll('#catNav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===fabCat?'active':''}" data-dir="fcat:${b.dataset.cat}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
+ const cats=[...document.querySelectorAll('.cat-nav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===fabCat?'active':''}" data-dir="fcat:${b.dataset.cat}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"></button>`).join('');
  const rows=inputs.map((inp,idx)=>({n:inp.dataset.name,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>fabCat==='todos'||x.cat===fabCat).map(x=>{
   const rc=recipeText(x.n), cm=canMake(x.n), cl=costLine(x.n);
   return `<button type="button" class="enc-card fab-item" data-q="${esc(norm(x.n+' '+rc))}" data-dir="fab-open:${x.idx}"><div class="t">${esc(x.n)}</div><div class="it">${rc?'Receta: '+esc(rc)+`<br>Con el almacén actual: <b>${cm}</b> ${cm===1?'unidad':'unidades'}`+(cl?'<br>'+cl:''):'Sin receta (no gasta materiales)'}</div></button>`;
@@ -3555,7 +3625,7 @@ async function contractBlob(e){
   kv('INICIO DEL CONTRATO',fmtISO(e.inicio));
   kv('PERIODO DE PRUEBA',e.sinPrueba?'Sin periodo de prueba':'1 semana · hasta el '+fmtISO(e.prueba||isoAdd(e.inicio,6)));
   y+=6;
-  wrap('El empleado se compromete a desempeñar su oficio con diligencia, honradez y lealtad a la casa, y a guardar el debido cuidado con las mercancías, los objetos en depósito y la caja. La casa abonará el sueldo pactado cada semana.','18px '+ff,ink,26);
+  wrap('El empleado se compromete a desempeñar su oficio con diligencia, honradez y lealtad a la casa, y a guardar el debido cuidado con las armas, la munición y la caja. La casa abonará el sueldo pactado cada semana.','18px '+ff,ink,26);
   y+=6;
   {const up=e.sinPrueba&&e.ascensos&&e.ascensos[e.ascensos.length-1];wrap(up?'Contrato por ascenso de '+up.de+' a '+up.a+'. Sustituye al anterior y rige desde el '+dayStr(up.desde)+'.':'Durante el periodo de prueba, cualquiera de las partes podrá dar por terminada esta relación sin más aviso.','italic 18px '+ff,'#4a3417',26)}
   y+=18;
@@ -3576,7 +3646,7 @@ async function contractBlob(e){
  }catch(x){return null}
 }
 function renderModStock(){
- const cats=[...document.querySelectorAll('#catNav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
+ const cats=[...document.querySelectorAll('.cat-nav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
  const rows=inputs.map((inp,idx)=>({inp:inp,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>stockCat==='todos'||x.cat===stockCat).map(x=>{
   const n=x.inp.dataset.name;
   const rc=recipeText(n);
@@ -3632,7 +3702,7 @@ async function undoFab(){
  try{localStorage.removeItem('tienda_lastfab')}catch(e){}
  renderDir();calc(false);say('Fabricación deshecha');
 }
-const DIR_SECCIONES=[['VENTAS Y CAJA',['ventas','semanales','estadisticas','gastos','sueldos','objetivo','balance','cierre']],['CATÁLOGO, PRECIOS Y CONVENIOS',['productos','convenios']],['ALMACÉN Y STOCK',['stock','fabricacion','regstock']],['PROVEEDORES',['proveedores','nuevopedido','regpedidos']],['PERSONAL',['empleados','horarios','ausencias']],['CLIENTES',['clientes']],['SISTEMA',['revision','historial','discord','nube','copia','reset']]];
+const DIR_SECCIONES=[['VENTAS Y CAJA',['ventas','compras','semanales','estadisticas','gastos','sueldos','objetivo','balance','cierre']],['CATÁLOGO, PRECIOS Y CONVENIOS',['productos','convenios']],['ALMACÉN Y STOCK',['stock','fabricacion','regstock']],['PROVEEDORES',['proveedores','nuevopedido','regpedidos']],['PERSONAL',['empleados','horarios','ausencias']],['CLIENTES',['clientes']],['SISTEMA',['revision','historial','discord','nube','copia','reset']]];
 let dirLast=null;
 document.getElementById('dirModal').addEventListener('toggle',e=>{const d=e.target;if(!d.matches||!d.matches('details.mod-sec'))return;let st={};try{st=JSON.parse(localStorage.getItem('tienda_dirsec')||'{}')}catch(x){}if(d.open)st[d.dataset.sec]=1;else delete st[d.dataset.sec];try{localStorage.setItem('tienda_dirsec',JSON.stringify(st))}catch(x){}},true);
 function renderDir(){
@@ -3873,64 +3943,41 @@ document.querySelectorAll('.product').forEach(pr=>{
  if(ic&&src)ic.innerHTML=`<img src="${src}" alt="" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-icon')" onerror="iconErr(this)">`;
 });
 const DESCRIPCIONES={
-'Collar de diamantes':'Pieza de alto valor, muy buscada por coleccionistas. Precio NPC: $120.',
-'Collar de perlas':'Elegante collar de perlas naturales, muy cotizado en tiendas finas.',
-'Collar de oro':'Cadena de oro macizo, clásico de la joyería de lujo del siglo XIX.',
-'Anillo de bodas':'Alianza de oro, símbolo de compromiso. Alta demanda entre particulares.',
-'Anillo de compromiso':'Solitario con piedra engastada, de gran valor sentimental y económico.',
-'Pendiente de diamantes':'Par de pendientes con diamantes engastados en oro. Precio NPC: $24.',
-'Pendiente de esmeralda':'Pendientes con esmeraldas talladas, llamativos y valiosos.',
-'Pendiente de perlas':'Pendientes de perlas naturales, elegantes y delicados.',
-'Pendiente de rubís':'Pendientes con rubíes, piedra preciosa de gran demanda.',
-'Pulsera':'Pulsera de metal precioso con acabado artesanal.',
-'Gargantilla':'Joya de cuello de alto valor. Una de las piezas más buscadas.',
-'Solitario de rosa':'Anillo solitario con piedra rosa, pieza delicada y cotizada.',
-'Reloj de lujo':'Reloj de bolsillo con caja de oro y maquinaria suiza. Precio NPC: $23.',
-'Reloj de bolsillo':'Reloj de bolsillo de plata con cadena. Muy funcional y coleccionable.',
-'Reloj de pared':'Reloj de madera tallada con péndulo. Pieza decorativa de valor.',
-'Cuadro lujoso 1':'Óleo sobre lienzo de gran formato. Precio NPC: $120.',
-'Cuadro lujoso 2':'Óleo sobre lienzo de gran formato. Precio NPC: $120.',
-'Cuadro lujoso 3':'Óleo sobre lienzo de gran formato. Precio NPC: $120.',
-'Cuadro lujoso 4':'Óleo sobre lienzo de gran formato. Precio NPC: $120.',
-'Cuadro':'Pintura en lienzo de tamaño medio, decorativa y valorada.',
-'Estatua':'Estatua decorativa de cerámica o bronce. Precio NPC: $14,40.',
-'Estatua de cerámica':'Figura de cerámica pintada a mano, pieza de colección.',
-'Estatua de fertilidad':'Figura ritual de gran antigüedad y valor arqueológico.',
-'Jarrón de plata':'Jarrón de plata repujada, pieza decorativa de alto valor.',
-'Espejo':'Espejo con marco dorado. Artículo decorativo muy buscado. Precio NPC: $8,40.',
-'Linterna':'Linterna de aceite de uso general. Artículo de primera necesidad.',
-'Linterna de Navi':'Linterna de cristal con decoración navideña.',
-'Biblia':'Biblia encuadernada en cuero, con anotaciones internas.',
-'Pluma de oro':'Pluma estilográfica con plumín de oro, artículo de lujo.',
-'Gemelos':'Gemelos de camisa con incrustaciones, distinción para caballeros.',
-'Alfiler':'Alfiler de corbata con piedra preciosa, complemento de lujo.',
-'Joyero':'Cajita para guardar joyas, con incrustaciones decorativas.',
-'Peine de plata':'Peine de plata con mango grabado, artículo de tocador de lujo.',
-'Monedas antiguas':'Monedas de época colonial, buscadas por coleccionistas.',
-'Pin de oro':'Pin decorativo chapado en oro, complemento de solapa.',
-'Cachimba de oro':'Cachimba con boquilla de oro, artículo de lujo para fumadores.',
-'Cachimba rosa':'Cachimba de porcelana rosa, pieza delicada y cotizada.',
-'Cachimba morada':'Cachimba de madera lacada en morado, artículo exclusivo.',
-'Cachimba roja':'Cachimba de madera tallada en rojo, pieza decorativa.',
-'Cachimba plateada':'Cachimba con acabados plateados, artículo de calidad.',
-'Gafas de leer':'Gafas con montura de metal y cristales de aumento.',
-'Binoculares mejorados':'Prismáticos de precisión con óptica de calidad superior.',
-'Crucifijo de plata':'Crucifijo de plata con cadena, artículo religioso de valor.',
-'Éter':'Frasco de éter, sustancia química de uso médico.',
-'Calomelano':'Compuesto de mercurio usado en medicina. Manipular con cuidado.',
-'Mesa ping pong':'Mesa de ping pong plegable, artículo de ocio y entretenimiento.',
-'Fonógrafo':'Fonógrafo de cilindros con trompeta, pieza tecnológica de época.',
-'Cámara avanzada':'Cámara fotográfica de fuelle con trípode, artículo de lujo.',
-'Mochila de superviviente':'Mochila robusta para viajes largos, muy completa.',
-'Mochila de viajero':'Mochila de lona con múltiples compartimentos.',
-'Mochila de cazador':'Mochila diseñada para portar piezas de caza.',
-'Mochila básica':'Mochila sencilla de uso cotidiano.',
-'Brújula':'Brújula de bolsillo con caja de latón.',
-'Cantimplora vacía':'Cantimplora de metal esmaltado, artículo de supervivencia.',
-'Diario':'Cuaderno encuadernado en cuero para anotar cuentas y observaciones.',
-'Caña de pescar':'Caña de bambú con sedal y anzuelo.',
-'Mapa':'Mapa regional dibujado a mano, útil para rutas y negocios.',
-'Mapa de pesca':'Mapa con los mejores puntos de pesca de la región.'}
+'Cattleman Revolver':'Revólver de acción simple y seis disparos, robusto y fiable. El clásico de cualquier vaquero.',
+'Doble Action Revolver':'Revólver de doble acción: se dispara sin amartillar a mano, ideal cuando cada segundo cuenta.',
+'Schofield Revolver':'Revólver de rotura con extracción automática de casquillos, muy práctico para recargar a caballo.',
+'Lemat Revolver':'Rareza de nueve recámaras con un segundo cañón de perdigones bajo el principal.',
+'Navy Revolver':'Revólver de cañón largo, preciso y equilibrado, de origen naval.',
+'Navy Crossover Revolver':'Una versión del Navy pensada para el camino: ligera, precisa y de acabado cuidado.',
+'Semiautomática Pistola':'Pistola semiautomática con cargador de caja: más disparos y recarga rápida.',
+'Mauser Pistola':'Pistola de cañón largo con el cargador delante del gatillo, reconocible a simple vista.',
+'Volcanic Pistola':'Pistola de repetición de palanca, de las primeras de su clase. Una pieza de coleccionista.',
+'M1899 Pistola':'Pistola semiautomática compacta de finales de siglo, ligera y fácil de llevar encima.',
+'Carabina Repetición':'Carabina de palanca corta y manejable, perfecta para llevarla al caballo.',
+'Evans Repetición':'Repetidora de gran capacidad, con cargador helicoidal en la culata.',
+'Henry Repetición':'Repetidora de palanca con cargador tubular, rápida y resistente.',
+'Winchester Repetición':'La repetidora más famosa del Oeste: palanca ágil, cañón preciso y mucha cadencia.',
+'Varmint':'Rifle ligero pensado para alimañas y caza menor.',
+'Springfield Rifle':'Rifle de un solo tiro con cerrojo, preciso a larga distancia y de gran potencia.',
+'Cerrojo Rifle':'Rifle de cerrojo para caza mayor: recarga manual segura y un tiro certero.',
+'Recortada Escopeta':'Escopeta de cañones recortados: poco alcance, pero demoledora de cerca.',
+'Doble Cañón Escopeta':'Escopeta de dos cañones paralelos: dos disparos seguidos de gran dispersión.',
+'Escopeta Exótica':'Escopeta de fabricación singular y acabado especial, para quien busca algo distinto.',
+'Cuchillo':'Cuchillo de monte resistente para desollar, cortar y salir de apuros.',
+'Hacha':'Hacha de mano de acero forjado: útil para la leña y, si hace falta, para defenderse.',
+'Machete':'Hoja ancha y pesada para abrirse paso entre la maleza.',
+'Arco':'Arco de caza silencioso y fiable, para quien prefiere no hacer ruido.',
+'Munición Escopeta':'Cartuchos de perdigones para escopeta. Caja surtida.',
+'Munición Pistola':'Cartuchos para pistola. Caja surtida.',
+'Munición Repetidora':'Cartuchos para repetidoras de palanca. Caja surtida.',
+'Munición Revolver':'Cartuchos para revólver. Caja surtida.',
+'Munición Rifle':'Cartuchos de gran calibre para rifle. Caja surtida.',
+'Flechas':'Flechas de caza con punta de acero, en haz surtido.',
+'Trapo':'Trapo de algodón para limpiar y secar el arma.',
+'Pólvora':'Bote de pólvora negra para recargar tus propios cartuchos.',
+'Lazo':'Lazo de cuerda trenzada para reses y caballos.',
+'Lazo Reforzado':'Lazo trenzado con refuerzo en el nudo, aguanta tirones fuertes.',
+'Aceite de Arma':'Aceite fino que protege el metal del óxido y mantiene suave el mecanismo.'};
 const prodModal=document.getElementById('prodModal');
 document.getElementById('prodClose').onclick=()=>closeModal(prodModal);
 prodModal.addEventListener('click',e=>{if(e.target===prodModal)closeModal(prodModal)});
@@ -4228,12 +4275,23 @@ function setMode(m){
  appMode=m;
  applyMode(modeStash[m]||{qty:{},customer:null,loadedEnc:null});
  document.body.classList.toggle('mode-presupuesto',m==='presupuesto');
+ document.body.classList.toggle('mode-compra',m==='compra');
  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
- document.getElementById('orderTitle').textContent=m==='presupuesto'?'PRESUPUESTO':'PEDIDO ACTUAL';
+ document.getElementById('orderTitle').textContent=m==='presupuesto'?'PRESUPUESTO':m==='compra'?'COMPRA ACTUAL':'PEDIDO ACTUAL';
+ document.getElementById('totalLabel').textContent=m==='compra'?'TOTAL PAGADO':'TOTAL';
+ // Sincronizar empleados en selector de compra
+ if(m==='compra'){
+   const sel=document.getElementById('empSelC');
+   if(sel){const cur=sel.value;sel.innerHTML='<option value="">Elige empleado</option>'+empleados.map(e=>`<option value="${esc(e.name)}"${e.name===cur?' selected':''}>${esc(e.name)}</option>`).join('');if(cur)sel.value=cur;}
+ }
  const gr=document.querySelector('.grid');gr.classList.remove('flip');void gr.offsetWidth;gr.classList.add('flip');
  renderCustomer();customerChanged();
 }
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
+const finishBuyBtn=document.getElementById('finishBuy');
+if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();finishBuyAction();};
+const newBuyBtn=document.getElementById('newBuy');
+if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();say('Nueva compra');};
 document.getElementById('toSale').onclick=async()=>{
  if(appMode!=='presupuesto')return;
  const st=captureMode();
