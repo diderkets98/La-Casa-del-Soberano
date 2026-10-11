@@ -62,7 +62,7 @@
 <div class="goal-bar" id="goalBar" hidden></div>
 <div class="emp-week" id="empWeek" hidden></div>
 
-<nav class="cat-nav" id="catNav" aria-label="Categorías"></nav>
+<nav class="cat-nav" aria-label="Categorías"></nav>
 
 <div class="category-visual" id="categoryVisual">
   <img id="categoryImage" data-src="cabecera-catalogo.webp" alt="Catálogo">
@@ -71,6 +71,7 @@
 
 <div class="mode-tabs" id="modeTabs">
   <button type="button" class="mode-tab on" data-mode="venta">VENTA</button>
+  <button type="button" class="mode-tab" data-mode="compra">COMPRA</button>
   <button type="button" class="mode-tab" data-mode="presupuesto">PRESUPUESTO</button>
   <button type="button" class="mode-tab mat-tab" id="matTab"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h12l4-3h2v5h-3l-2 2H10l-1 4h3v2H5v-2h2l1-4H3z"/></svg>MATERIALES</button>
 </div>
@@ -114,6 +115,10 @@
     <label class="fld wide only-venta" id="noteWrap"><span>Nota (opcional)</span><input id="saleNote" type="text" maxlength="120" autocomplete="off" placeholder="Ej.: grabado con las iniciales JS"></label>
     <label class="fld wide only-venta" id="promiseWrap" hidden><span>Entrega prevista (opcional)</span><input id="promiseDate" type="date"></label>
     <div class="client-note" id="clientNote" hidden></div>
+    <label class="fld wide only-compra" id="vendedorWrap"><span>Vendedor (quién te vende)</span>
+      <input id="vendedorName" type="text" maxlength="40" autocomplete="off" list="clientList" placeholder="Nombre del vendedor"></label>
+    <label class="fld wide only-compra" id="empWrapC"><span>Empleado</span><select id="empSelC"></select></label>
+    <label class="fld wide only-compra" id="noteWrapC"><span>Nota (opcional)</span><input id="buyNote" type="text" maxlength="120" autocomplete="off" placeholder="Ej.: collar comprado en Rhodes"></label>
   </div>
   <div class="cart" id="cart"><div class="empty"><span class="empty-art"><img src="vacio-pedido.webp" alt="" onerror="this.parentNode.classList.add('nofile')"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M6 14h34l4-4h10v8H44l-3 3h-7l-2 12h-9l2-12H6z"/><circle cx="27" cy="17" r="3.5"/><path d="M50 10V6M30 21l-1 4"/></svg></span>Aún no hay productos en el pedido.<br>Añade cantidades desde el catálogo.</div></div>
   <div class="summary" id="summary">0 productos · 0 unidades</div>
@@ -126,10 +131,12 @@
   <div class="total"><span id="totalLabel">TOTAL</span><span id="grand">$0.00</span></div>
   <div class="actions">
     <button class="finish only-venta" id="finish">Finalizar venta</button>
+    <button class="finish only-compra" id="finishBuy">Registrar compra</button>
     <button class="finish-enc only-venta" id="finishEnc" hidden>Finalizar encargo</button>
 
 
     <button class="new only-venta" id="new">Nueva venta</button>
+    <button class="new only-compra" id="newBuy">Nueva compra</button>
     <button class="to-sale only-pres" id="toSale" type="button">PASAR A VENTA ▸</button>
   </div>
   <div class="stamp"><img class="emblem" src="emblema.png" alt="">LA CASA DEL SOBERANO<br>COMPRA · VENTA · TASACIÓN<br>SAINT DENIS</div>
@@ -391,7 +398,7 @@
 (function(){
  var T=window.TIENDA||{}, cats=T.categorias||[], prods=T.productos||[];
  function x(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
- var nav=document.getElementById('catNav');
+ var nav=document.querySelector('.cat-nav');
  var btn=function(id,name,img,on){return '<button type="button" class="cat-btn'+(on?' active':'')+'" data-cat="'+x(id)+'" aria-pressed="'+(on?'true':'false')+'" title="'+x(name)+'"><img src="'+x(img)+'" alt="'+x(name)+'" onerror="this.parentNode.classList.add(\'noimg\')"><span class="cat-txt">'+x(name)+'</span></button>'};
  nav.innerHTML=btn('todos','Todos','boton-todos.webp',true)+cats.map(function(c){return btn(c.id,c.nombre,c.boton||('boton-'+c.id+'.webp'),false)}).join('');
  var box=document.getElementById('products'), html='';
