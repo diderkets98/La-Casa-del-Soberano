@@ -14,11 +14,12 @@ var TIENDA = {
   supabaseKey: 'sb_publishable_R9w5QKqznrBFuV0-aQR7PQ_5Ab_tBzP',
 
   categorias: [
-    { id: 'npc',       nombre: 'Objetos NPC',       seccion: 'OBJETOS NPC',      tipo: 'producto' },
-    { id: 'ilegales',  nombre: 'Ilegales / Crafteo', seccion: 'ILEGALES',         tipo: 'producto' },
-    { id: 'articulos', nombre: 'Artículos',          seccion: 'ARTÍCULOS',        tipo: 'producto' },
-    { id: 'empenos',   nombre: 'Casa de Empeños',    seccion: 'EMPEÑOS',          tipo: 'producto' },
-    { id: 'materiales',nombre: 'Materiales',         seccion: 'MATERIALES',       tipo: 'suministro' }
+    { id: 'npc',        nombre: 'Objetos NPC',      seccion: 'OBJETOS NPC',      tipo: 'producto' },
+    { id: 'ilegales',   nombre: 'Obj. Ilegales',    seccion: 'OBJ. ILEGALES',    tipo: 'producto' },
+    { id: 'joyas',      nombre: 'Joyas',            seccion: 'JOYAS',            tipo: 'producto' },
+    { id: 'articulos',  nombre: 'Artículos varios', seccion: 'ARTÍCULOS VARIOS', tipo: 'producto' },
+    { id: 'miscelanea', nombre: 'Miscelánea',       seccion: 'MISCELÁNEA',       tipo: 'producto' },
+    { id: 'materiales', nombre: 'Materiales',       seccion: 'MATERIALES',       tipo: 'suministro' }
   ],
 
   productos: [
