@@ -1241,7 +1241,7 @@ body.sandbox .net-bar{top:44px}
 .sbx-msg{margin:0 0 10px;padding:10px;border:1px solid #5d4928;border-radius:6px;background:#0a1610;white-space:pre-wrap;font-size:13px;color:#e9dcb8;overflow-wrap:anywhere}
 .sbx-msg small{display:block;margin-bottom:4px;color:#d9b45a;letter-spacing:.08em}
 .gc-stamp.prueba{border-color:#9a6a00;color:#9a6a00;background:#fff3c8dd}
-.gate .gc-stamp.prueba{top:61%;font-size:6cqw}
+.gate .gc-stamp.prueba{top:61%;font-size:3.5cqw}
 /* ===== Imágenes nuevas ===== */
 /* reverso de la tarjeta */
 .gate.back-img .gb-back{background:url(tarjeta-reverso.webp) center/100% 100% no-repeat;box-shadow:none;filter:drop-shadow(0 30px 40px #000) drop-shadow(0 0 40px #ffcf7a44);padding:16% 14% 14%}
