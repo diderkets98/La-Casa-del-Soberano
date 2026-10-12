@@ -3770,14 +3770,52 @@ async function contractBlob(e){
  }catch(x){return null}
 }
 function renderModStock(){
- const cats=[...document.querySelectorAll('#catNav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
- const rows=inputs.map((inp,idx)=>({inp:inp,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>stockCat==='todos'||x.cat===stockCat).map(x=>{
+ // Obtener categorías desde tiendaData
+ const categorias=tCats?tCats():[];
+ // Si no hay categoría seleccionada, mostrar lista de categorías
+ if(!stockCat||stockCat==='todos'){
+  const catCards=categorias.map(cat=>{
+   const total=inputs.filter(i=>i.closest('.product').dataset.cat===cat.id).length;
+   const enStock=inputs.filter(i=>i.closest('.product').dataset.cat===cat.id&&(stockMap[i.dataset.name]||0)>0).length;
+   const bajo=inputs.filter(i=>i.closest('.product').dataset.cat===cat.id&&(stockMin[i.dataset.name]||0)>0&&(stockMap[i.dataset.name]||0)<=(stockMin[i.dataset.name]||0)).length;
+   return `<button type="button" class="stock-cat-card" data-dir="scat:${esc(cat.id)}">
+    <div class="scc-nombre">${esc(cat.nombre)}</div>
+    <div class="scc-info">${enStock}/${total} con stock${bajo>0?` · <span class="lowtag">${bajo} bajos</span>`:''}</div>
+   </button>`;
+  }).join('');
+  return `<p class="bk-note">Selecciona una categoría para ver y editar el stock de sus productos.</p>
+  <div class="stock-cat-grid">${catCards}</div>`;
+ }
+ // Mostrar items de la categoría seleccionada
+ const catInfo=categorias.find(x=>x.id===stockCat)||{nombre:stockCat};
+ const rows=inputs.map((inp,idx)=>({inp:inp,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>x.cat===stockCat).map(x=>{
   const n=x.inp.dataset.name;
-  const rc=recipeText(n);
-  return `<div class="stock-row"><div><b><span class="dot ${dotCls(n)}"></span>${esc(n)}</b>${rc?`<small class="rc">Receta: ${esc(rc)}</small>`:''}<small>Stock actual: ${stockMap[n]||0}${(stockMin[n]||0)>0&&(stockMap[n]||0)<=(stockMin[n]||0)?' <span class="lowtag">BAJO</span>':''}</small><label class="minlbl">Mínimo <input class="min-in" type="text" inputmode="numeric" data-min="${esc(n)}" value="${esc(minDraft[n]!==undefined?minDraft[n]:(stockMin[n]||''))}" placeholder="0" aria-label="Stock mínimo"></label></div><div class="qty stock-qty"><button type="button" data-dir="sminus:${x.idx}" aria-label="Quitar una unidad">−</button><input type="text" inputmode="numeric" data-stock="${esc(n)}" value="${esc(stockDraft[n]||'0')}" aria-label="Unidades a añadir"><button type="button" data-dir="splus:${x.idx}" aria-label="Añadir una unidad">+</button></div></div>`;
+  const actual=stockMap[n]||0;
+  const esLow=(stockMin[n]||0)>0&&actual<=(stockMin[n]||0);
+  return `<div class="stock-row-new">
+   <div class="srn-info">
+    <span class="srn-nombre"><span class="dot ${dotCls(n)}"></span>${esc(n)}</span>
+    <span class="srn-actual ${esLow?'lowtag':''}">Stock: ${actual}</span>
+   </div>
+   <div class="srn-controls">
+    <button type="button" class="srn-btn" data-dir="sminus:${x.idx}">−</button>
+    <input type="text" inputmode="numeric" class="srn-input" data-stock="${esc(n)}" value="${esc(stockDraft[n]||'0')}" aria-label="Stock">
+    <button type="button" class="srn-btn" data-dir="splus:${x.idx}">+</button>
+   </div>
+   <label class="srn-min">Mín: <input class="min-in" type="text" inputmode="numeric" data-min="${esc(n)}" value="${esc(minDraft[n]!==undefined?minDraft[n]:(stockMin[n]||''))}" placeholder="0"></label>
+  </div>`;
  }).join('');
  const lf=lastFab();
- return `${lf?`<div class="enc-actions" style="margin-bottom:8px"><button type="button" class="warn" data-dir="fab-undo">↶ DESHACER ÚLTIMO AJUSTE (${esc(lf.items.map(x=>x.delta+' × '+x.producto).join(', '))} · ${ago(lf.ts)})</button></div>`:''}<p class="bk-note">Aquí puedes actualizar el stock de cada producto manualmente. Introduce las unidades disponibles y pulsa GUARDAR STOCK.</p><div class="cat-nav stock-cats">${cats}</div>${rows}<div class="pay-err" id="stErr" hidden></div><div class="enc-actions" style="margin-top:12px"><button type="button" class="primary" data-dir="stock-save">GUARDAR STOCK</button></div>`;
+ return `<div class="enc-actions" style="margin-bottom:8px">
+  <button type="button" data-dir="scat:" style="background:#1a1208;border:1px solid #5a4a20;color:#c8a84a;border-radius:4px;padding:4px 12px;cursor:pointer">← Volver a categorías</button>
+  <b style="color:#e8d48a;margin-left:12px">${esc(catInfo.nombre)}</b>
+ </div>
+ ${lf?`<div class="enc-actions" style="margin-bottom:8px"><button type="button" class="warn" data-dir="fab-undo">↶ DESHACER ÚLTIMO AJUSTE (${ago(lf.ts)})</button></div>`:''}
+ ${rows||'<div class="enc-empty">No hay productos en esta categoría.</div>'}
+ <div class="pay-err" id="stErr" hidden></div>
+ <div class="enc-actions" style="margin-top:12px">
+  <button type="button" class="primary" data-dir="stock-save">💾 GUARDAR STOCK</button>
+ </div>`;
 }
 function renderModRegistroStock(){
  const low=lowStock();
@@ -4404,7 +4442,11 @@ function setMode(m){
  applyMode(modeStash[m]||{qty:{},customer:null,loadedEnc:null});
  document.body.classList.toggle('mode-presupuesto',m==='presupuesto');
  document.body.classList.toggle('mode-compra',m==='compra');if(typeof updatePeristaBar==='function')updatePeristaBar();
- const ganBox2=document.getElementById('peristaGananciaBox');if(ganBox2){ganBox2.hidden=m==='compra';if(m==='compra')ganBox2.style.display='none';}
+ const ganBox2=document.getElementById('peristaGananciaBox');
+ if(ganBox2){
+   if(m==='compra'){ganBox2.style.display='flex';ganBox2.hidden=false;}
+   else{ganBox2.style.display='none';ganBox2.hidden=true;}
+ }
  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
  document.getElementById('orderTitle').textContent=m==='presupuesto'?'PRESUPUESTO':m==='compra'?'COMPRA ACTUAL':'PEDIDO ACTUAL';
  document.getElementById('totalLabel').textContent=m==='compra'?'TOTAL PAGADO':'TOTAL';
