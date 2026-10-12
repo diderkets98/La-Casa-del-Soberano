@@ -1644,8 +1644,11 @@ body.modo-cliente .p-venta-lbl{color:#5a9a64}
 body.modo-npc .p-venta{color:#3a6a42;pointer-events:none;opacity:.7}
 body.modo-cliente .p-venta{color:#6ecf7a;border-color:#2a5a30;pointer-events:auto;opacity:1}
 /* Mostrar/ocultar filas según modo */
-body.modo-npc .p-venta-row{display:none}
+body.modo-npc:not(.mode-compra) .p-venta-row{display:none}
 body.modo-cliente .p-npc-row{display:none}
+/* En modo compra: mostrar precio venta probable, ocultar NPC */
+body.mode-compra .p-npc-row{display:none!important}
+body.mode-compra .p-venta-row{display:flex!important}
 
 /* ══ MODO COMPRA ══ */
 body:not(.mode-compra) .only-compra{display:none!important}
@@ -1888,3 +1891,8 @@ body.mode-compra #totalLabel{color:#e05a5a}
 .enc-btn-sm:hover{background:#3a2a00}
 .positiva{color:#6ecf6e}
 .negativa{color:#cf6e6e}
+
+/* Widget ganancia perista — más discreto */
+.perista-gan-row{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;font-size:.8em;color:#a0b890;border-top:1px solid #2a2010;margin:0}
+#pGanLbl{color:#8a9880;font-size:.9em}
+#pGanVal{font-weight:700;font-size:1em}
