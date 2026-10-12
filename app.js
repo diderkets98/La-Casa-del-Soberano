@@ -343,7 +343,7 @@ function receiptText(s){
  groupItems(s).forEach(g=>{if(g.title)out.push(g.title,'');g.items.forEach(x=>{out.push(x.name);out.push(`${x.qty} × ${money(x.cents)} = ${money(x.qty*x.cents)}`);out.push('')})});
  out.push(line,summaryText(s.products,s.units));
  finRows(s).forEach(r=>out.push(r[0]+': '+r[1]));
- out.push(dueLabel(s)+': '+money(dueCents(s)),line,'','Tu lema aquí.');
+ out.push(dueLabel(s)+': '+money(dueCents(s)),line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return out.join('\n');
 }
 function renderReceipt(s){
@@ -874,7 +874,7 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
         box.id='peristaGananciaBox';
         box.className='perista-gan-row';
         box.innerHTML='<span id="pGanLbl">Ganancia estimada</span><span id="pGanVal"></span>';
-        ref.parentNode.insertBefore(box,ref);
+        ref.parentNode.insertBefore(box,ref.nextSibling);
       }
     }
     if(!box)return;
@@ -1035,17 +1035,17 @@ function stepsHTML(e){
 function plainCaps(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()}
 function encItemsTxt(e){return (e.items||[]).map(i=>i.qty+' × '+i.name).join(', ')}
 function telegramText(e){
- return `Nos complace anunciarle, Sr./Sra. ${e.client}, que su encargo en La Casa del Soberano ya tiene preparado su encargo (${encItemsTxt(e)}).${e.pendingCents>0?`\n\nImporte pendiente al recogerlo: ${money(e.pendingCents)}.`:''}\n\nPuede pasar a recogerlo cuando quiera. Dispone de un plazo de 10 días para hacerlo: transcurrido ese plazo, perderá el producto y el dinero depositado como fianza.\n\nTu lema aquí.`;
+ return `Buenos días, Sr./Sra. ${e.client}.\n\nMe complace informarle que su encargo de ${encItemsTxt(e)} ya se encuentra listo para ser retirado en La Casa del Soberano, Saint Denis.${e.pendingCents>0?`\n\nImporte pendiente al recoger: ${money(e.pendingCents)}.`:''}\n\nDispone de un plazo de 10 días para pasar a recogerlo; transcurrido dicho plazo, perderá el artículo y el depósito abonado.\n\nPara cualquier consulta, no dude en escribirme a mi telegrama. Estaré al pendiente.\n\nCon estimación,\nLa Casa del Soberano — Saint Denis.`;
 }
 function telegramConfirm(e){
- return `Sr./Sra. ${e.client}: le confirmamos su encargo en La Casa del Soberano, Saint Denis\n\n${encItemsTxt(e)}\nTotal: ${money(e.totalCents)} · Fianza pagada: ${money(e.depositCents)} · Pendiente al recoger: ${money(e.pendingCents)}.${e.promise?`\nFecha prevista: ${fmtISO(e.promise)}.`:''}\n\nLe avisaremos por telegrama en cuanto esté listo.\n\nTu lema aquí.`;
+ return `Buenos días, Sr./Sra. ${e.client}.\n\nLe confirmamos la recepción de su encargo en La Casa del Soberano, Saint Denis.\n\n${encItemsTxt(e)}\nTotal: ${money(e.totalCents)} · Fianza abonada: ${money(e.depositCents)} · Pendiente al recoger: ${money(e.pendingCents)}.${e.promise?`\nFecha prevista de entrega: ${fmtISO(e.promise)}.`:''}\n\nEn cuanto su encargo esté preparado, le avisaremos por telegrama. Para cualquier consulta puede escribirme a mi telegrama, estaré al pendiente.\n\nCon estimación,\nLa Casa del Soberano — Saint Denis.`;
 }
 function telegramRemind(e){
- return `Sr./Sra. ${e.client}: le recordamos que su encargo (${encItemsTxt(e)}) le espera en La Casa del Soberano, Saint Denis.${e.pendingCents>0?` Importe pendiente: ${money(e.pendingCents)}.`:''}\n\nRecuerde que dispone de 10 días desde el aviso para recogerlo; pasado ese plazo, perderá el producto y la fianza.\n\nTu lema aquí.`;
+ return `Buenos días, Sr./Sra. ${e.client}.\n\nLe recordamos que su encargo de ${encItemsTxt(e)} le espera en La Casa del Soberano, Saint Denis.${e.pendingCents>0?` Importe pendiente al recoger: ${money(e.pendingCents)}.`:''}\n\nRecuerde que dispone de 10 días desde este aviso para pasar a recogerlo; transcurrido ese plazo, perderá el artículo y la fianza depositada.\n\nPara cualquier consulta, puede escribirme a mi telegrama, estaré al pendiente.\n\nCon estimación,\nLa Casa del Soberano — Saint Denis.`;
 }
 function pedidoTelegram(prov,items,paid,code){
  const tot=items.reduce((a,x)=>a+x.qty*x.price,0);
- return `La Casa del Soberano, Saint Denis.\nPedido para ${prov}:\n\n${items.map(x=>`• ${x.qty} × ${x.material} a ${money(x.price)} = ${money(x.qty*x.price)}`).join('\n')}\n\nTotal: ${money(tot)}. ${paid?'Pagado por adelantado.':'Se paga a la entrega.'}${code?`\nReferencia: ${code}`:''}\n\nTu lema aquí.`;
+ return `Buenos días.\n\nSolicito el siguiente pedido al precio estipulado:\n\n${items.map(x=>`• ${x.qty} × ${x.material} a ${money(x.price)} = ${money(x.qty*x.price)}`).join('\n')}\n\nTotal: ${money(tot)}. ${paid?'Pago adelantado incluido.':'Pago a la entrega.'}${code?`\nReferencia del pedido: ${code}`:''}\n\nPara cualquier consulta o duda, puede escribirme a mi telegrama, estaré al pendiente.\n\nCon estimación,\nLa Casa del Soberano — Saint Denis.`;
 }
 async function copyMsg(t,ok){if(await copyText(t))say(ok||'Mensaje copiado · pégalo en el telegrama');else prompt('Copia este texto:',t)}
 async function copyTelegram(id){
@@ -1692,7 +1692,7 @@ function weekDoc(list,type,ws){
  const line='────────────────────', now=Date.now();
  const out=['LA CASA DEL SOBERANO',type==='ventas'?'REGISTRO SEMANAL DE VENTAS':'REGISTRO SEMANAL DE FICHAJES','Saint Denis · 1880','','Semana: '+dayStr(ws)+' – '+dayStr(ws+6),'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  list.forEach(e=>{out.push(line,'EMPLEADO: '+e.name,line,'');empLines(e,type).forEach(x=>out.push(x));out.push('')});
- out.push(line,'','Tu lema aquí.');
+ out.push(line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return out.join('\n');
 }
 function saveTextFile(text,name){
@@ -1988,7 +1988,7 @@ function gastosDoc(){
  const o=['LA CASA DEL SOBERANO','REGISTRO DE GASTOS · '+pi.kind,'Saint Denis · 1880','',(pi.sem?'Semana: ':'Día: ')+pi.label,'Generado: '+fmtDate(now)+' '+fmtTime(now),''];
  a.ex.forEach(x=>o.push(`${x.date} ${x.time} · ${CAT_NAMES[x.cat]}`,x.concepto,'Importe: '+money(x.cents),''));
  if(!a.ex.length)o.push('Sin gastos en este periodo.','');
- o.push(line,'Proveedor: '+money(a.byCat.proveedor),'Sueldos: '+money(a.byCat.sueldos),'Otros gastos: '+money(a.byCat.otros),'TOTAL GASTOS: '+money(a.gas),line,'','Tu lema aquí.');
+ o.push(line,'Proveedor: '+money(a.byCat.proveedor),'Sueldos: '+money(a.byCat.sueldos),'Otros gastos: '+money(a.byCat.otros),'TOTAL GASTOS: '+money(a.gas),line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return o.join('\n');
 }
 function renderModBalance(){
@@ -2011,7 +2011,7 @@ function balanceDoc(){
   for(let d=pi.r.s;d<=pi.r.e;d++){const x=accounts({s:d,e:d});o.push(`${DIAS[new Date(d*86400000).getUTCDay()]} ${dayStr(d)} · Ingresos: ${money(x.ing)} · Gastos: ${money(x.gas)} · Beneficio: ${sgn(x.ben)}`)}
   o.push('');
  }
- o.push(line,`INGRESOS (ventas cobradas): ${money(a.ing)} · ${a.ops} ${plural(a.ops,'operación','operaciones')}`,'','GASTOS','  Proveedor: '+money(a.byCat.proveedor),'  Sueldos: '+money(a.byCat.sueldos),'  Otros gastos: '+money(a.byCat.otros),'  Total gastos: '+money(a.gas),'',`BENEFICIO: ${sgn(a.ben)}`,line,'','Tu lema aquí.');
+ o.push(line,`INGRESOS (ventas cobradas): ${money(a.ing)} · ${a.ops} ${plural(a.ops,'operación','operaciones')}`,'','GASTOS','  Proveedor: '+money(a.byCat.proveedor),'  Sueldos: '+money(a.byCat.sueldos),'  Otros gastos: '+money(a.byCat.otros),'  Total gastos: '+money(a.gas),'',`BENEFICIO: ${sgn(a.ben)}`,line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return o.join('\n');
 }
 dirModal.addEventListener('input',e=>{
@@ -2267,7 +2267,7 @@ function addClientPrice(){
 let ccCount='';
 function cierreDoc(c){
  const line='────────────────────';
- return ['LA CASA DEL SOBERANO','CIERRE DE CAJA','Saint Denis · 1880','','Día: '+c.date+' · '+c.time,'',line,'Ingresos cobrados: '+money(c.ing),'Gastos: '+money(c.gas),'Esperado en caja: '+sgn(c.exp),'Dinero contado: '+money(c.count),'DIFERENCIA: '+sgn(c.diff)+(c.diff===0?' (cuadra)':c.diff>0?' (sobra)':' (falta)'),line,'','Tu lema aquí.'].join('\n');
+ return ['LA CASA DEL SOBERANO','CIERRE DE CAJA','Saint Denis · 1880','','Día: '+c.date+' · '+c.time,'',line,'Ingresos cobrados: '+money(c.ing),'Gastos: '+money(c.gas),'Esperado en caja: '+sgn(c.exp),'Dinero contado: '+money(c.count),'DIFERENCIA: '+sgn(c.diff)+(c.diff===0?' (cuadra)':c.diff>0?' (sobra)':' (falta)'),line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.'].join('\n');
 }
 function renderModCierre(){
  const t=todayNum(), a=accounts({s:t,e:t}), exp=a.ing-a.gas, cnt=parseMoney(ccCount), diff=cnt-exp;
@@ -2480,7 +2480,7 @@ const DC_THUMB={ventas:'moneda-oro.webp',encargos:'vacio-encargos.webp',pedidos:
 function dcThumb(k){try{return DC_THUMB[k]&&/^https?:/.test(location.protocol)?new URL(DC_THUMB[k],location.href).href:''}catch(e){return ''}}
 function dcIcon(){try{return /^https?:/.test(location.protocol)?new URL('emblema.png',location.href).href:''}catch(e){return ''}}
 /* Convierte el texto de siempre en una tarjeta: 1.ª línea = título; «Clave: valor» en negrita */
-const DC_SKIP={'LA CASA DEL SOBERANO':1,'Saint Denis · 1880':1,'Tu lema aquí.':1};
+const DC_SKIP={'LA CASA DEL SOBERANO':1,'Saint Denis · 1880':1,'Con estimación,\nLa Casa del Soberano — Saint Denis.':1};
 function dcEmbed(kind,text,img){
  const L=String(text).split('\n').filter(l=>!DC_SKIP[l.trim()]&&!/^─{4,}$/.test(l.trim()));
  while(L.length&&!L[0].trim())L.shift();
@@ -3294,7 +3294,7 @@ function monthlyText(off){
   'Lo más vendido: '+(top.length?top.map((x,i)=>(i+1)+'. '+x[0]+' ('+x[1]+' uds.)').join(' · '):'—'),
   'Mejor cliente: '+(cl?cl[0]+' ('+money(cl[1])+')':'—'),
   'Pedidos a proveedores completados: '+peds.length+' ('+money(peds.reduce((s,x)=>s+x.totalCents,0))+')','',
-  'Tu lema aquí.'];
+  'Con estimación,\nLa Casa del Soberano — Saint Denis.'];
  return L.join('\n');
 }
 let monthBusy=false;
@@ -3548,7 +3548,7 @@ function pedidosDoc(){
   o.push('Total: '+money(r.totalCents),'Recibido por: '+(r.receivedBy||'—')+' · Pagado por: '+(r.paidBy||'—'),'');
  });
  if(!L.length)o.push('Sin pedidos completados en este periodo.','');
- o.push(line,'Pedidos: '+L.length,'TOTAL EN PEDIDOS: '+money(L.reduce((a,x)=>a+x.totalCents,0)),line,'','Tu lema aquí.');
+ o.push(line,'Pedidos: '+L.length,'TOTAL EN PEDIDOS: '+money(L.reduce((a,x)=>a+x.totalCents,0)),line,'','Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return o.join('\n');
 }
 function renderModRegPedidos(){
@@ -3779,7 +3779,7 @@ async function contractBlob(e){
  }catch(x){return null}
 }
 function renderModStock(){
- const cats=[...document.querySelectorAll('.cat-nav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
+ const cats=[...document.querySelectorAll('#catNav .cat-btn')].map(b=>`<button type="button" class="cat-btn ${b.dataset.cat===stockCat?'active':''}" data-dir="scat:${b.dataset.cat}" title="${esc(b.title)}"><img src="${esc(b.querySelector('img').getAttribute('src'))}" alt="${esc(b.title)}"><span class="cat-txt">${esc(b.title)}</span></button>`).join('');
  const rows=inputs.map((inp,idx)=>({inp:inp,idx:idx,cat:inp.closest('.product').dataset.cat})).filter(x=>stockCat==='todos'||x.cat===stockCat).map(x=>{
   const n=x.inp.dataset.name;
   const rc=recipeText(n);
@@ -4155,7 +4155,7 @@ async function ticketBlob(s){
   if(emb){const h=90,w=emb.width*h/emb.height;g.drawImage(emb,(W-w)/2,y,w,h);y+=h+36}else y+=14;
   ctr('LA CASA DEL SOBERANO','bold 30px '+fb,'#1b3022',34);
   ctr('Saint Denis · 1880','17px '+ff,'#6b4c1d',26);
-  ctr('Tu lema aquí.','italic 19px '+ff,ink,34);
+  ctr('Con estimación,\nLa Casa del Soberano — Saint Denis.','italic 19px '+ff,ink,34);
   ctr(s.op==='encargo'?'REGISTRO DE ENCARGO':'REGISTRO DE VENTA','bold 15px '+fb,ink,30);
   const kv=(k,v)=>{g.textAlign='left';g.font='13px '+ff;g.fillStyle='#6b4c1d';g.fillText(k.toUpperCase(),P,y);y+=19;g.font='bold 20px '+ff;g.fillStyle=ink;let t=String(v);while(g.measureText(t).width>W-2*P&&t.length>4)t=t.slice(0,-2);g.fillText(t===String(v)?t:t+'…',P,y);y+=27};
   kv(s.op==='encargo'?'Encargo N.º':'Venta N.º',s.id);kv('Fecha y hora',s.date+' · '+s.time);
@@ -4412,6 +4412,7 @@ function setMode(m){
  applyMode(modeStash[m]||{qty:{},customer:null,loadedEnc:null});
  document.body.classList.toggle('mode-presupuesto',m==='presupuesto');
  document.body.classList.toggle('mode-compra',m==='compra');if(typeof updatePeristaBar==='function')updatePeristaBar();
+ const ganBox=document.getElementById('peristaGananciaBox');if(ganBox)ganBox.hidden=m==='compra';
  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
  document.getElementById('orderTitle').textContent=m==='presupuesto'?'PRESUPUESTO':m==='compra'?'COMPRA ACTUAL':'PEDIDO ACTUAL';
  document.getElementById('totalLabel').textContent=m==='compra'?'TOTAL PAGADO':'TOTAL';
@@ -4426,7 +4427,7 @@ function setMode(m){
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
 const finishBuyBtn=document.getElementById('finishBuy');if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();openBuyForm();};
 const newBuyBtn=document.getElementById('newBuy');
-if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();say('Nueva compra');};
+if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();setMode('venta');say('Artículos listos para vender');};
 document.getElementById('toSale').onclick=async()=>{
  if(appMode!=='presupuesto')return;
  const st=captureMode();
@@ -4584,7 +4585,7 @@ function shiftText(r){
  const out=['LA CASA DEL SOBERANO','REGISTRO DE FICHAJE','Saint Denis · 1880','','Empleado: '+r.name];
  if(same)out.push('Fecha: '+fmtDate(r.start),'Entrada: '+fmtTime(r.start),'Salida: '+fmtTime(r.end));
  else out.push('Entrada: '+fmtStamp(r.start),'Salida: '+fmtStamp(r.end));
- out.push('Tiempo: '+fmtDuration(r.start,r.end),'',line,'Tu lema aquí.');
+ out.push('Tiempo: '+fmtDuration(r.start,r.end),'',line,'Con estimación,\nLa Casa del Soberano — Saint Denis.');
  return out.join('\n');
 }
 async function copyShift(){
