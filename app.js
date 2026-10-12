@@ -867,16 +867,6 @@ noteInput.addEventListener('input',()=>{customer.note=noteInput.value;customerCh
       if(adq){totalAdq+=adq*qty;hayAdq=true;}
     });
     var box=document.getElementById('peristaGananciaBox');
-    if(!box){
-      var ref=document.getElementById('grand');
-      if(ref){
-        box=document.createElement('div');
-        box.id='peristaGananciaBox';
-        box.className='perista-gan-row';
-        box.innerHTML='<span id="pGanLbl">Ganancia estimada</span><span id="pGanVal"></span>';
-        ref.parentNode.insertBefore(box,ref.nextSibling);
-      }
-    }
     if(!box)return;
     if(!hayAdq){box.style.display='none';return;}
     box.style.display='flex';
@@ -1618,6 +1608,7 @@ ${a.length?a.map(r=>`
   <div class="inv-actions">
     <button type="button" class="enc-btn-sm" data-dir="inv-edit:${esc(r.id)}">✏ Editar</button>
     ${(r.qty||0)===0?`<button type="button" class="enc-btn-sm" data-dir="inv-restock:${esc(r.id)}">↩ Reponer</button>`:''}
+    <button type="button" class="enc-btn-sm enc-btn-del" data-dir="inv-del:${esc(r.id)}">🗑 Eliminar</button>
   </div>
 </div>`).join(''):'<div class="enc-empty">Todavía no hay artículos comprados.<br>Usa el modo COMPRA para añadirlos.</div>'}
 </div>`;
@@ -3111,7 +3102,7 @@ document.addEventListener('keydown',e=>{
  if(e.ctrlKey||typing||anyModal)return;
  if(e.key==='/'){const q=document.getElementById('search');if(q){e.preventDefault();q.focus();q.select()}}
  else if(e.key==='?'){e.preventDefault();openTutorial()}
- else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('#catNav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
+ else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('.cat-nav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
 });
 /* ===== Libro de turno: notas para el siguiente turno ===== */
 const KEY_NOTAS='tienda_notas_v1', libroModal=document.getElementById('libroModal'), libroBtn=document.getElementById('libroBtn');
@@ -3924,6 +3915,7 @@ dirModal.addEventListener('click',e=>{
  else if(act==='cp-add')addCustomProduct();
  else if(act==='cp-del')delCustomProduct(decodeURIComponent(arg));
  else if(act==='inv-edit'){openBuyForm(arg);}
+ else if(act==='inv-del'){const _a=loadInventory().filter(x=>x.id!==arg);saveInventory(_a);say('Artículo eliminado');renderDir();}
  else if(act==='inv-new'){openBuyForm();}
  else if(act==='inv-restock'){updateInventoryItem(arg,{qty:1});say('Objeto repuesto');renderDir();}
  else if(act==='cl-new'){clEdit='new';clView=null;clWork={name:'',type:'particular',telegram:'',ident:'',precios:{},series:[]};renderDir()}
@@ -4412,7 +4404,7 @@ function setMode(m){
  applyMode(modeStash[m]||{qty:{},customer:null,loadedEnc:null});
  document.body.classList.toggle('mode-presupuesto',m==='presupuesto');
  document.body.classList.toggle('mode-compra',m==='compra');if(typeof updatePeristaBar==='function')updatePeristaBar();
- const ganBox=document.getElementById('peristaGananciaBox');if(ganBox)ganBox.hidden=m==='compra';
+ const ganBox2=document.getElementById('peristaGananciaBox');if(ganBox2){ganBox2.hidden=m==='compra';if(m==='compra')ganBox2.style.display='none';}
  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
  document.getElementById('orderTitle').textContent=m==='presupuesto'?'PRESUPUESTO':m==='compra'?'COMPRA ACTUAL':'PEDIDO ACTUAL';
  document.getElementById('totalLabel').textContent=m==='compra'?'TOTAL PAGADO':'TOTAL';
@@ -4426,6 +4418,14 @@ function setMode(m){
 }
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
 const finishBuyBtn=document.getElementById('finishBuy');if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();openBuyForm();};
+const btnMat=document.getElementById('btnMateriales');
+if(btnMat)btnMat.onclick=()=>{
+  playClick();
+  dirMod='materiales';dirForm=null;
+  dirModal.hidden=false;
+  document.body.classList.add('modal-open');
+  renderDir();dirModal.scrollTop=0;
+};
 const newBuyBtn=document.getElementById('newBuy');
 if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();setMode('venta');say('Artículos listos para vender');};
 document.getElementById('toSale').onclick=async()=>{
