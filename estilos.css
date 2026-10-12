@@ -22,3 +22,25 @@ body.mode-compra .p-venta-row{display:flex!important}
 /* Botón mini Materiales a la derecha de los tabs */
 .mode-tab-mini{margin-left:auto;font-size:.7em;padding:4px 8px;background:#1a1208;border:1px solid #5a4a20;color:#a08050;border-radius:4px;cursor:pointer;letter-spacing:.06em;white-space:nowrap;height:fit-content;align-self:center}
 .mode-tab-mini:hover{background:#2a1a08;color:#e8d48a;border-color:#9a7a3a}
+
+/* ══ STOCK REDISEÑADO ══ */
+.stock-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:8px 0}
+.stock-cat-card{background:#1a1208;border:1px solid #5a4a20;border-radius:6px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.stock-cat-card:hover{background:#2a1a08;border-color:#9a7a3a}
+.scc-nombre{font-family:'Cinzel',serif;color:#e8d48a;font-size:.95em;margin-bottom:4px}
+.scc-info{font-size:.78em;color:#8a7a50}
+.stock-row-new{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1a1208;flex-wrap:wrap}
+.stock-row-new:hover{background:#120e04}
+.srn-info{flex:1;min-width:150px}
+.srn-nombre{color:#e8d48a;font-size:.9em;display:flex;align-items:center;gap:6px}
+.srn-actual{font-size:.78em;color:#8a7a50;margin-top:2px;display:block}
+.srn-controls{display:flex;align-items:center;gap:6px}
+.srn-btn{width:30px;height:30px;background:#2a1a00;border:1px solid #5a4a20;color:#e8d48a;border-radius:4px;cursor:pointer;font-size:1.1em;display:flex;align-items:center;justify-content:center}
+.srn-btn:hover{background:#3a2a00}
+.srn-input{width:52px;text-align:center;background:#110e05;border:1px solid #5a4a20;border-radius:4px;color:#e8d48a;padding:4px 6px;font-size:.95em}
+.srn-min{font-size:.78em;color:#6a5a30;display:flex;align-items:center;gap:4px}
+.srn-min input{width:40px;background:#110e05;border:1px solid #3a2a10;border-radius:3px;color:#a08050;padding:2px 4px;font-size:.85em;text-align:center}
+
+/* Ganancia: visible solo en modo compra */
+body:not(.mode-compra) #peristaGananciaBox{display:none!important}
+body.mode-compra #peristaGananciaBox{display:flex!important}
