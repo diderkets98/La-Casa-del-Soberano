@@ -1857,3 +1857,34 @@ body.mode-compra #totalLabel{color:#e05a5a}
 .enc-btn-sm:hover{background:#3a2a00}
 .positiva{color:#6ecf6e}
 .negativa{color:#cf6e6e}
+
+/* ══ TARJETA DE INVENTARIO EN CATÁLOGO ══ */
+.inv-card{border:1px solid #4a6a4a;background:#0d1a0d}
+.inv-cat-ico{font-size:1.4em;display:flex;align-items:center;justify-content:center;height:100%}
+.inv-vendedor-tag{font-size:.75em;color:#80a080;margin-bottom:4px;font-style:italic}
+.buy-help-msg{padding:10px 0;color:#b8a060;font-size:.9em;font-style:italic}
+
+/* Modal formulario compra */
+.buy-form-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
+.buy-form-box{background:#1a1208;border:2px solid #7a5a22;border-radius:8px;padding:20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
+.buy-form-title{font-family:'Cinzel',serif;color:#e8d48a;font-size:1.05em;letter-spacing:.08em;margin-bottom:14px;text-align:center;border-bottom:1px solid #3a2a0a;padding-bottom:8px}
+.buy-form-ganancia{min-height:22px;text-align:center;font-size:.92em;margin:2px 0 8px}
+.buy-form-actions{display:flex;gap:10px;margin-top:14px}
+.buy-form-actions button{flex:1}
+
+/* Filas de inventario en dirección */
+.inv-row{border-left:3px solid #5a4a20;margin-bottom:8px;padding:10px 12px;border-radius:4px;background:#151005}
+.inv-disp{border-left-color:#4a8a4a}
+.inv-sold{border-left-color:#5a3a3a;opacity:.75}
+.inv-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.inv-main b{color:#e8d48a}
+.inv-cat-badge{font-size:.74em;background:#2a1a00;border:1px solid #5a4a20;border-radius:3px;padding:1px 6px;color:#a08040}
+.inv-badge-disp{font-size:.72em;background:#1a3a1a;border:1px solid #3a6a3a;border-radius:3px;padding:1px 6px;color:#6ecf6e}
+.inv-badge-sold{font-size:.72em;background:#3a1a1a;border:1px solid #6a3a3a;border-radius:3px;padding:1px 6px;color:#cf6e6e}
+.inv-detail{font-size:.84em;color:#b8a060;margin-bottom:4px}
+.inv-nota{font-size:.8em;color:#807050;font-style:italic;margin-bottom:4px}
+.inv-actions{display:flex;gap:8px;margin-top:6px}
+.enc-btn-sm{font-size:.78em;padding:3px 10px;background:#2a1a00;border:1px solid #5a4a20;color:#c8a84a;border-radius:3px;cursor:pointer}
+.enc-btn-sm:hover{background:#3a2a00}
+.positiva{color:#6ecf6e}
+.negativa{color:#cf6e6e}
