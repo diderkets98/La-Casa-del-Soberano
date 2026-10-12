@@ -4418,14 +4418,7 @@ function setMode(m){
 }
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
 const finishBuyBtn=document.getElementById('finishBuy');if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();openBuyForm();};
-const btnMat=document.getElementById('btnMateriales');
-if(btnMat)btnMat.onclick=()=>{
-  playClick();
-  dirMod='materiales';dirForm=null;
-  dirModal.hidden=false;
-  document.body.classList.add('modal-open');
-  renderDir();dirModal.scrollTop=0;
-};
+
 const newBuyBtn=document.getElementById('newBuy');
 if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();setMode('venta');say('Artículos listos para vender');};
 document.getElementById('toSale').onclick=async()=>{
