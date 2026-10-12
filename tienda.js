@@ -187,6 +187,14 @@ var TIENDA = {
     { nombre: 'Carne de pescado', categoria: 'materiales', precio: 0.50 },
     { nombre: 'Carne de salmón',  categoria: 'materiales', precio: 0.60 },
     { nombre: 'Carne de caza',    categoria: 'materiales', precio: 0.50 },
-    { nombre: 'Pepita de oro',    categoria: 'materiales', precio: 0.30 }
+    { nombre: 'Pepita de oro',    categoria: 'materiales', precio: 0.30 },
+
+    // Miscelánea — tabaco y pipas
+    { nombre: 'Caja de puros',       categoria: 'miscelanea', precio: 4.30 },
+    { nombre: 'Caja de cigarrillos', categoria: 'miscelanea', precio: 4.00 },
+    { nombre: 'Cigarrillos sueltos', categoria: 'miscelanea', precio: 0.40 },
+    { nombre: 'Pipa normal',         categoria: 'miscelanea', precio: 1.60 },
+    { nombre: 'Pipa tallada',        categoria: 'miscelanea', precio: 2.45 },
+    { nombre: 'Pipa de calavera',    categoria: 'miscelanea', precio: 2.30 }
   ]
 };
