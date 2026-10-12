@@ -4424,8 +4424,7 @@ function setMode(m){
  renderCustomer();customerChanged();
 }
 document.querySelectorAll('.mode-tab[data-mode]').forEach(b=>b.onclick=()=>{if(b.dataset.mode!==appMode)playClick();setMode(b.dataset.mode)});
-const finishBuyBtn=document.getElementById('finishBuy');
-const finishBuyBtn2=document.getElementById('finishBuy');if(finishBuyBtn2)finishBuyBtn2.onclick=()=>{playClick();openBuyForm();};
+const finishBuyBtn=document.getElementById('finishBuy');if(finishBuyBtn)finishBuyBtn.onclick=()=>{playClick();openBuyForm();};
 const newBuyBtn=document.getElementById('newBuy');
 if(newBuyBtn)newBuyBtn.onclick=()=>{playClick();clearAll();say('Nueva compra');};
 document.getElementById('toSale').onclick=async()=>{
