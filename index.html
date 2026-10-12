@@ -62,7 +62,7 @@
 <div class="goal-bar" id="goalBar" hidden></div>
 <div class="emp-week" id="empWeek" hidden></div>
 
-<nav class="cat-nav" id="catNav" aria-label="Categorías"></nav>
+<nav class="cat-nav" aria-label="Categorías"></nav>
 
 <div class="category-visual" id="categoryVisual">
   <img id="categoryImage" data-src="cabecera-catalogo.webp" alt="Catálogo">
@@ -73,6 +73,7 @@
   <button type="button" class="mode-tab on" data-mode="venta">VENTA</button>
   <button type="button" class="mode-tab" data-mode="compra">COMPRA</button>
   <button type="button" class="mode-tab" data-mode="presupuesto">PRESUPUESTO</button>
+  <button type="button" class="mode-tab-mini boss-btn" id="btnMateriales" title="Almacén de materiales">⚗ MAT.</button>
   <button type="button" class="mode-tab mat-tab" id="matTab"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h12l4-3h2v5h-3l-2 2H10l-1 4h3v2H5v-2h2l1-4H3z"/></svg>MATERIALES</button>
 </div>
 
@@ -125,6 +126,7 @@
     <div class="pay-err" id="depositErr" hidden></div>
   </div>
   <div class="breakdown" id="breakdown"></div>
+  <div class="perista-gan-row" id="peristaGananciaBox" style="display:none"><span id="pGanLbl">Ganancia estimada</span><span id="pGanVal"></span></div>
   <div class="total"><span id="totalLabel">TOTAL</span><span id="grand">$0.00</span></div>
   <div class="actions">
     <button class="finish only-venta" id="finish">Finalizar venta</button>
@@ -417,7 +419,6 @@
             '</div>'+
             '<div class="p-card-precios">'+
               '<div class="p-precio-row"><span class="p-precio-lbl">Precio de compra</span><input class="p-adq" type="text" inputmode="decimal" placeholder="0.00" data-name="'+x(p.nombre)+'"></div>'+
-              '<div class="p-precio-row p-npc-row"><span class="p-precio-lbl">Venta al NPC</span><span class="p-npc-val">$'+pr+'</span></div>'+
               '<div class="p-precio-row p-venta-row"><span class="p-precio-lbl p-venta-lbl">Venta probable</span><input class="p-venta" type="text" inputmode="decimal" placeholder="'+pr+'" data-default="'+pr+'" data-name="'+x(p.nombre)+'"></div>'+
             '</div>'+
           '</div>'+
