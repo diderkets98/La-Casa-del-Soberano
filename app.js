@@ -3111,7 +3111,7 @@ document.addEventListener('keydown',e=>{
  if(e.ctrlKey||typing||anyModal)return;
  if(e.key==='/'){const q=document.getElementById('search');if(q){e.preventDefault();q.focus();q.select()}}
  else if(e.key==='?'){e.preventDefault();openTutorial()}
- else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('.cat-nav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
+ else if(/^[1-9]$/.test(e.key)){const c=document.querySelectorAll('#catNav .cat-btn')[+e.key-1];if(c){e.preventDefault();c.click()}}
 });
 /* ===== Libro de turno: notas para el siguiente turno ===== */
 const KEY_NOTAS='tienda_notas_v1', libroModal=document.getElementById('libroModal'), libroBtn=document.getElementById('libroBtn');
