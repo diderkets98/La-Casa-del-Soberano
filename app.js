@@ -5741,6 +5741,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventLi
 /* ===== Inicio ===== */
 restoreOrder();
 restoreSale();
+/* Si la nube no tiene credenciales de jefe, limpiar también el localStorage */
+(async()=>{try{const r=await sbFetch('/rest/v1/datos?clave=eq.jefe&select=clave');if(r.ok){const d=await r.json();if(!d.length){try{localStorage.removeItem('tienda_boss_cred_v1');localStorage.removeItem('tienda_boss_pw_v1');localStorage.removeItem('tienda_boss_word_v1');}catch(e){}}}}catch(e){}})();
 try{applyMe();gateCheck();if(meEmp())presencePing(true)}catch(e){}
 calc(false);
 filter();
