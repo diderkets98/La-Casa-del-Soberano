@@ -4150,7 +4150,7 @@ prodModal.addEventListener('click',e=>{if(e.target===prodModal)closeModal(prodMo
 document.getElementById('products').addEventListener('click',e=>{
  const nm=e.target.closest('.pname'); if(!nm)return;
  const row=nm.closest('.product'), inp=row.querySelector('.qty input'), n=inp.dataset.name;
- const cp=loadObj(KEY_CUSTPROD,[]).find(x=>x.name===n), desc=DESCRIPCIONES[n]||(cp&&cp.desc)||'Pieza del catálogo de Mi Tienda.';
+ const cp=loadObj(KEY_CUSTPROD,[]).find(x=>x.name===n), desc=DESCRIPCIONES[n]||(cp&&cp.desc)||'Pieza del catálogo de La Casa del Soberano.';
  const ic=row.querySelector('.weapon-icon').cloneNode(true), ok=(stockMap[n]||0)>0||(customer.op==='encargo'&&!loadedEnc);
  document.getElementById('prodTitle').textContent=n.toUpperCase();
  const bossInfo=bossActive?prodBossHTML(n):'';
@@ -5226,7 +5226,7 @@ function gateOpen(opt){
  const st=document.getElementById('gSignTxt');st.innerHTML=[...'LA CASA DEL SOBERANO'].map((ch,i)=>`<i style="animation-delay:${(0.9+i*0.07+(i%3)*0.05).toFixed(2)}s">${ch===' '?'&nbsp;':ch}</i>`).join('');
  const full=!opt.quick&&!gReduced();
  G.full=full;gFx(true);loadPhotos();
- if(full){gPh('scene');gUi.innerHTML='<button type="button" class="g-enter" id="gEnter">ENTRAR</button><div class="g-hint">Mi Tienda · Mi Ciudad</div>';gBoltLoop(3500)}
+ if(full){gPh('scene');gUi.innerHTML='<button type="button" class="g-enter" id="gEnter">ENTRAR</button><div class="g-hint">La Casa del Soberano · Saint Denis</div>';gBoltLoop(3500)}
  else gateCards();
 }
 /* ---- sonidos de la entrada ---- */
