@@ -1,7 +1,7 @@
 /* MI TIENDA · sw.js
    Guarda la web en el móvil para que se abra al instante y aunque no haya conexión.
    Va en la misma carpeta que index.html. No hace falta tocarlo nunca. */
-const CACHE = 'tienda-v3';
+const CACHE = 'tienda-v1';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
